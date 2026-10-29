@@ -15,7 +15,7 @@
 
   // --- GLOBAL STATE ---
   let currentLang = localStorage.getItem("poly_lang") || "ru";
-  let currentTheme = localStorage.getItem("poly_theme") || "catppuccin";
+  let currentTheme = localStorage.getItem("poly_theme") || "synthwave";
 
   // Polynomial state: P(x) = c0 + c1*x + c2*x^2 + c3*x^3 + c4*x^4
   const polyState = {
@@ -1185,11 +1185,15 @@
   }
 
   function applyTheme(theme) {
+    const sel = document.getElementById("themeSelect");
+    if (sel) {
+      const valid = Array.from(sel.options).some(opt => opt.value === theme);
+      if (!valid) theme = "synthwave";
+      if (sel.value !== theme) sel.value = theme;
+    }
     currentTheme = theme;
     localStorage.setItem("poly_theme", theme);
     document.documentElement.setAttribute("data-theme", theme);
-    const sel = document.getElementById("themeSelect");
-    if (sel && sel.value !== theme) sel.value = theme;
     drawWindow1();
     drawWindow2();
   }

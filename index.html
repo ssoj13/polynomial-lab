@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="catppuccin">
+<html lang="ru" data-theme="synthwave">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,13 +32,34 @@
       </button>
       <button class="help-q" data-help="clutch" title="Что такое Сцепление (Clutch)?">?</button>
 
-      <!-- 5 Real Iconic Color Themes -->
+      <!-- 22 Curated Themes from daisyUI & Base16 -->
       <select id="themeSelect" class="theme-select" aria-label="Color Theme">
-        <option value="catppuccin">🎨 Catppuccin Mocha</option>
-        <option value="tokyonight">🌃 Tokyo Night</option>
-        <option value="rosepine">🌹 Rosé Pine</option>
-        <option value="gruvbox">🪵 Gruvbox Dark</option>
-        <option value="dawn">☀️ Rosé Pine Dawn</option>
+        <optgroup label="🌙 Dark &amp; Neon (daisyUI + Base16)">
+          <option value="synthwave">🌆 Synthwave (Neon 80s)</option>
+          <option value="dracula">🧛 Dracula</option>
+          <option value="cyberpunk">⚡ Cyberpunk 2077</option>
+          <option value="luxury">👑 Luxury (Obsidian &amp; Gold)</option>
+          <option value="night">🌌 Night (Deep Navy)</option>
+          <option value="forest">🌲 Forest (Emerald Woods)</option>
+          <option value="coffee">☕ Coffee (Roasted Espresso)</option>
+          <option value="aqua">🌊 Aqua (Deep Ocean)</option>
+          <option value="halloween">🎃 Halloween (Pumpkin &amp; Violet)</option>
+          <option value="black">🖤 Black OLED (Pure Contrast)</option>
+          <option value="nord">❄️ Nord (Arctic Frost)</option>
+          <option value="monokai">🔥 Monokai Pro</option>
+          <option value="onedark">⚛️ One Dark (Atom)</option>
+          <option value="solarized-dark">🪐 Solarized Dark</option>
+          <option value="kanagawa">🌊 Kanagawa Wave</option>
+          <option value="everforest">🌿 Everforest Dark</option>
+          <option value="ayu-mirage">✨ Ayu Mirage</option>
+          <option value="catppuccin">🎨 Catppuccin Mocha</option>
+        </optgroup>
+        <optgroup label="☀️ Light &amp; Paper (daisyUI + Base16)">
+          <option value="retro">📻 Retro 1970s Cream</option>
+          <option value="cupcake">🧁 Cupcake Soft Paper</option>
+          <option value="emerald">💎 Emerald Textbook White</option>
+          <option value="solarized-light">📜 Solarized Light Parchment</option>
+        </optgroup>
       </select>
 
       <!-- Trilingual Switcher (EN / RU / MN) -->
@@ -87,18 +108,11 @@
          ===================================================================== -->
     <section id="card2d" class="widget-card">
       <div class="widget-header">
-        <div class="widget-title-group">
-          <span class="widget-badge" data-i18n="w1_badge">ОКНО #1 • 2D ПЛОСКИЙ МИР</span>
-          <h2 class="widget-title" data-i18n="w1_title">Геометрия кривой y = P(x) и Радар комплексных корней</h2>
-          <button class="help-q" data-help="w1">?</button>
-        </div>
-
-        <div class="widget-toolbar">
-          <div class="tab-group">
-            <button class="tab-btn active" data-tab2d="anatomy" data-i18n="tab_anatomy">1. Кирпичики</button>
-            <button class="tab-btn" data-tab2d="roots" data-i18n="tab_roots">2. Корни</button>
-            <button class="tab-btn" data-tab2d="taylor" data-i18n="tab_taylor">3. Тейлор & Горнер</button>
-            <button class="tab-btn" data-tab2d="bezier" data-i18n="tab_bezier">4. Безье vs Лагранж</button>
+        <div class="widget-top-row">
+          <div class="widget-title-group">
+            <span class="widget-badge" data-i18n="w1_badge">ОКНО #1 • 2D ПЛОСКИЙ МИР</span>
+            <h2 class="widget-title" data-i18n="w1_title">Геометрия кривой y = P(x) и Радар комплексных корней</h2>
+            <button class="help-q" data-help="w1">?</button>
           </div>
 
           <div class="widget-hw-right">
@@ -111,6 +125,15 @@
             <button class="jvc-btn jvc-icon-btn" data-expand="card2d" title="Expand / Collapse">
               <span>⛶</span>
             </button>
+          </div>
+        </div>
+
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-tab2d="anatomy" data-i18n="tab_anatomy">1. Кирпичики</button>
+            <button class="tab-btn" data-tab2d="roots" data-i18n="tab_roots">2. Корни</button>
+            <button class="tab-btn" data-tab2d="taylor" data-i18n="tab_taylor">3. Тейлор & Горнер</button>
+            <button class="tab-btn" data-tab2d="bezier" data-i18n="tab_bezier">4. Безье vs Лагранж</button>
           </div>
         </div>
       </div>
@@ -258,20 +281,12 @@
          ===================================================================== -->
     <section id="card3d" class="widget-card">
       <div class="widget-header">
-        <div class="widget-title-group">
-          <span class="widget-badge" data-i18n="w2_badge">ОКНО #2 • 3D ПРОМЕЖУТОЧНЫЙ МОСТ</span>
-          <h2 class="widget-title" data-i18n="w2_title">3D-Ландшафт модуля h(x,y) = |P(x + iy)| и 3D-Крыло Безье</h2>
-          <button class="help-q" data-help="w2">?</button>
-        </div>
-
-        <div class="widget-toolbar">
-          <div class="tab-group">
-            <button class="tab-btn active" data-tab3d="trampoline" data-i18n="tab_3d_tramp">1. 3D-Батут |P(x+iy)|</button>
-            <button class="tab-btn" data-tab3d="bezier3d" data-i18n="tab_3d_bezier">2. 3D-Крыло Безье</button>
+        <div class="widget-top-row">
+          <div class="widget-title-group">
+            <span class="widget-badge" data-i18n="w2_badge">ОКНО #2 • 3D ПРОМЕЖУТОЧНЫЙ МОСТ</span>
+            <h2 class="widget-title" data-i18n="w2_title">3D-Ландшафт модуля h(x,y) = |P(x + iy)| и 3D-Крыло Безье</h2>
+            <button class="help-q" data-help="w2">?</button>
           </div>
-
-          <button id="btnProfile3D" class="jvc-btn" data-i18n="btn_profile_3d">👁 Сбоку (2D-срез)</button>
-          <button id="btnResetCam3D" class="jvc-btn" data-i18n="btn_reset_cam">↺ Камера 3D</button>
 
           <div class="widget-hw-right">
             <!-- Per-Window Clutch (Square button + Red/Green LED Dot only) -->
@@ -284,6 +299,16 @@
               <span>⛶</span>
             </button>
           </div>
+        </div>
+
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-tab3d="trampoline" data-i18n="tab_3d_tramp">1. 3D-Батут |P(x+iy)|</button>
+            <button class="tab-btn" data-tab3d="bezier3d" data-i18n="tab_3d_bezier">2. 3D-Крыло Безье</button>
+          </div>
+
+          <button id="btnProfile3D" class="jvc-btn" data-i18n="btn_profile_3d">👁 Сбоку (2D-срез)</button>
+          <button id="btnResetCam3D" class="jvc-btn" data-i18n="btn_reset_cam">↺ Камера 3D</button>
         </div>
       </div>
 
@@ -352,17 +377,11 @@
          ===================================================================== -->
     <section id="card4d" class="widget-card">
       <div class="widget-header">
-        <div class="widget-title-group">
-          <span class="widget-badge" data-i18n="w3_badge">ОКНО #3 • 4D ГИПЕРПРОСТРАНСТВО (WEBGL2)</span>
-          <h2 class="widget-title" data-i18n="w3_title">Комплексная поверхность z₁ⁿ + z₂ⁿ = c, Расслоение Хопфа и Калаби–Яу</h2>
-          <button class="help-q" data-help="w3">?</button>
-        </div>
-
-        <div class="widget-toolbar">
-          <div class="tab-group">
-            <button class="tab-btn active" data-preset4d="0" data-i18n="mp0">Расслоение Хопфа</button>
-            <button class="tab-btn" data-preset4d="1" data-i18n="mp1">Квинтика Калаби–Яу</button>
-            <button class="tab-btn" data-preset4d="2" data-i18n="mp2">Тороидальный узел</button>
+        <div class="widget-top-row">
+          <div class="widget-title-group">
+            <span class="widget-badge" data-i18n="w3_badge">ОКНО #3 • 4D ГИПЕРПРОСТРАНСТВО (WEBGL2)</span>
+            <h2 class="widget-title" data-i18n="w3_title">Комплексная поверхность z₁ⁿ + z₂ⁿ = c, Расслоение Хопфа и Калаби–Яу</h2>
+            <button class="help-q" data-help="w3">?</button>
           </div>
 
           <div class="widget-hw-right">
@@ -375,6 +394,14 @@
             <button class="jvc-btn jvc-icon-btn" data-expand="card4d" title="Expand / Collapse">
               <span>⛶</span>
             </button>
+          </div>
+        </div>
+
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-preset4d="0" data-i18n="mp0">Расслоение Хопфа</button>
+            <button class="tab-btn" data-preset4d="1" data-i18n="mp1">Квинтика Калаби–Яу</button>
+            <button class="tab-btn" data-preset4d="2" data-i18n="mp2">Тороидальный узел</button>
           </div>
         </div>
       </div>
