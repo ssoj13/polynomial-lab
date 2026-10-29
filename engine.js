@@ -488,13 +488,47 @@
           const ry = toY(0);
           ctx.fillStyle = theme.accent3;
           ctx.beginPath();
-          ctx.arc(rx, ry, 6.5, 0, Math.PI * 2);
+          ctx.arc(rx, ry, 7, 0, Math.PI * 2);
           ctx.fill();
           ctx.strokeStyle = theme.bg;
           ctx.lineWidth = 2;
           ctx.stroke();
         }
       });
+
+      // Draw interactive curve-bending grab handles so user knows they can grab & bend the curve directly
+      if (mode === "anatomy") {
+        const handleXs = [-1.8, -1.0, 0.0, 1.0, 1.8];
+        handleXs.forEach(hx => {
+          const hy = evalPolyReal(coeffs, hx);
+          if (hy >= yMin + 0.15 && hy <= yMax - 0.15) {
+            const px = toX(hx);
+            const py = toY(hy);
+            ctx.fillStyle = hx === 0 ? theme.warn : theme.accent2;
+            ctx.beginPath();
+            ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = theme.bg;
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+          }
+        });
+      } else if (mode === "roots") {
+        // Draw amplitude handle at midpoint between r1 and r2
+        const midX = 0.5 * (polyState.roots[0] + polyState.roots[1]);
+        const midY = evalPolyReal(coeffs, midX);
+        if (midY >= yMin + 0.15 && midY <= yMax - 0.15) {
+          const px = toX(midX);
+          const py = toY(midY);
+          ctx.fillStyle = theme.warn;
+          ctx.beginPath();
+          ctx.arc(px, py, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = theme.bg;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      }
     } else if (mode === "taylor") {
       ctx.strokeStyle = theme.accent2;
       ctx.lineWidth = 2.2;
@@ -680,14 +714,14 @@
     const cy = ry * cosP - rz * sinP;
     const cz = ry * sinP + rz * cosP;
 
-    const camDist = 7.2 / zoom;
-    const fov = Math.min(w, h) * 0.68;
-    const depth = camDist + cy * 0.42;
+    const camDist = 5.0 / zoom;
+    const fov = Math.min(w, h) * 0.96;
+    const depth = camDist + cy * 0.35;
     const s = fov / Math.max(1.2, depth);
 
     return {
-      sx: w * 0.5 + rx * s * 0.42,
-      sy: h * 0.62 - cz * s * 0.42,
+      sx: w * 0.5 + rx * s * 0.88,
+      sy: h * 0.64 - cz * s * 0.88,
       depth
     };
   }
@@ -1433,26 +1467,184 @@
 
     const c2d = document.getElementById("plot2dCanvas");
     if (c2d) {
+      let drag2D = null; // { kind: 'anatomy'|'root'|'rootScale'|'taylor'|'bezierPt'|'bezierT', idx: number }
+
+      const getWorld2D = e => {
+        const rect = c2d.getBoundingClientRect();
+        const x = -3.2 + ((e.clientX - rect.left) / Math.max(1, rect.width)) * 6.4;
+        const y = 3.2 - ((e.clientY - rect.top) / Math.max(1, rect.height)) * 6.4;
+        return {
+          x: Math.max(-3.0, Math.min(3.0, x)),
+          y: Math.max(-3.0, Math.min(3.0, y)),
+          hitRadius: e.pointerType === "touch" ? 0.58 : 0.40
+        };
+      };
+
+      const applyDrag2D = e => {
+        if (!drag2D) return;
+        const { x, y } = getWorld2D(e);
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+        if (drag2D.kind === "anatomy") {
+          // Direct curve bending: P(x) = c0 + c1*x + c2*x^2 + c3*x^3 + c4*x^4
+          if (Math.abs(x) < 0.34) {
+            // Grabbing near center X=0 directly lifts/lowers a0
+            const rest =
+              polyState.c[1] * x +
+              polyState.c[2] * x * x +
+              polyState.c[3] * Math.pow(x, 3) +
+              polyState.c[4] * Math.pow(x, 4);
+            polyState.c[0] = clamp(y - rest, -2.5, 2.5);
+          } else {
+            // Weighted minimum-norm monomial bend at grabbed x so the curve bends right to the finger/cursor!
+            const curY = evalPolyReal(polyState.c, x);
+            const dy = y - curY;
+            const weights = [0.20, 0.55, 0.95, 0.48, 0.30];
+            const basis = [1, x, x * x, x * x * x, x * x * x * x];
+            let denom = 0;
+            for (let k = 0; k <= 4; k++) {
+              const wk = weights[k] * basis[k];
+              denom += wk * wk;
+            }
+            if (denom > 1e-6) {
+              const limits = [2.5, 2.5, 2.5, 2.0, 1.5];
+              for (let k = 0; k <= 4; k++) {
+                const delta = (dy * (weights[k] * weights[k]) * basis[k]) / denom;
+                polyState.c[k] = clamp(polyState.c[k] + delta * 0.85, -limits[k], limits[k]);
+              }
+            }
+          }
+          sync2DSlidersFromState();
+          propagateFrom2D();
+          drawWindow1();
+          drawWindow2();
+        } else if (drag2D.kind === "root") {
+          polyState.roots[drag2D.idx] = clamp(x, -2.5, 2.5);
+          const rk = ["R1", "R2", "R3"][drag2D.idx];
+          const sl = document.getElementById("sl" + rk);
+          const vl = document.getElementById("val" + rk);
+          if (sl) sl.value = polyState.roots[drag2D.idx].toFixed(2);
+          if (vl) vl.textContent = polyState.roots[drag2D.idx].toFixed(2);
+          propagateFrom2D();
+          drawWindow1();
+          drawWindow2();
+        } else if (drag2D.kind === "rootScale") {
+          const denom =
+            (x - polyState.roots[0]) *
+            (x - polyState.roots[1]) *
+            (x - polyState.roots[2]);
+          if (Math.abs(denom) > 0.12) {
+            polyState.rootScale = clamp(y / denom, -1.5, 1.5);
+            const slRA = document.getElementById("slRA");
+            const vlRA = document.getElementById("valRA");
+            if (slRA) slRA.value = polyState.rootScale.toFixed(2);
+            if (vlRA) vlRA.textContent = polyState.rootScale.toFixed(2);
+            propagateFrom2D();
+            drawWindow1();
+            drawWindow2();
+          }
+        } else if (drag2D.kind === "taylor") {
+          const norm = clamp((Math.abs(x) - 0.3) / 2.3, 0, 1);
+          const deg = 1 + 2 * Math.round(norm * 6);
+          polyState.taylorDeg = deg;
+          const slT = document.getElementById("slTaylorDeg");
+          const vlT = document.getElementById("valTaylorDeg");
+          if (slT) slT.value = String(deg);
+          if (vlT) vlT.textContent = String(deg);
+          updateHornerTelemetry();
+          drawWindow1();
+        } else if (drag2D.kind === "bezierPt") {
+          polyState.ctrlPts[drag2D.idx] = {
+            x: clamp(x, -2.9, 2.9),
+            y: clamp(y, -2.9, 2.9)
+          };
+          drawWindow1();
+        } else if (drag2D.kind === "bezierT") {
+          const tVal = clamp((x + 2.4) / 4.8, 0, 1);
+          polyState.bezierT = tVal;
+          const slB = document.getElementById("slBezierT");
+          const vlB = document.getElementById("valBezierT");
+          if (slB) slB.value = tVal.toFixed(2);
+          if (vlB) vlB.textContent = tVal.toFixed(2);
+          drawWindow1();
+        }
+      };
+
       c2d.addEventListener("pointerdown", e => {
-        if (polyState.mode2d !== "bezier") return;
-        const rect = c2d.getBoundingClientRect();
-        const x = -3.2 + ((e.clientX - rect.left) / rect.width) * 6.4;
-        const y = 3.2 - ((e.clientY - rect.top) / rect.height) * 6.4;
-        polyState.ctrlPts.forEach((p, idx) => {
-          if (Math.hypot(p.x - x, p.y - y) < 0.38) polyState.draggingPt = idx;
-        });
+        const { x, y, hitRadius } = getWorld2D(e);
+        if (polyState.mode2d === "bezier") {
+          let hitIdx = -1;
+          polyState.ctrlPts.forEach((p, idx) => {
+            if (Math.hypot(p.x - x, p.y - y) < hitRadius) hitIdx = idx;
+          });
+          if (hitIdx >= 0) {
+            drag2D = { kind: "bezierPt", idx: hitIdx };
+          } else {
+            drag2D = { kind: "bezierT", idx: 0 };
+          }
+        } else if (polyState.mode2d === "roots") {
+          let hitRoot = -1;
+          polyState.roots.forEach((r, idx) => {
+            if (Math.hypot(r - x, y) < hitRadius * 1.15) hitRoot = idx;
+          });
+          if (hitRoot >= 0) {
+            drag2D = { kind: "root", idx: hitRoot };
+          } else {
+            drag2D = { kind: "rootScale", idx: 0 };
+          }
+        } else if (polyState.mode2d === "taylor") {
+          drag2D = { kind: "taylor", idx: 0 };
+        } else {
+          drag2D = { kind: "anatomy", idx: 0 };
+        }
+        try { c2d.setPointerCapture(e.pointerId); } catch (_) {}
+        applyDrag2D(e);
       });
-      window.addEventListener("pointermove", e => {
-        if (polyState.draggingPt < 0) return;
-        const rect = c2d.getBoundingClientRect();
-        const x = Math.max(-2.9, Math.min(2.9, -3.2 + ((e.clientX - rect.left) / rect.width) * 6.4));
-        const y = Math.max(-2.9, Math.min(2.9, 3.2 - ((e.clientY - rect.top) / rect.height) * 6.4));
-        polyState.ctrlPts[polyState.draggingPt] = { x, y };
-        drawWindow1();
+
+      c2d.addEventListener("pointermove", e => {
+        if (!drag2D) return;
+        applyDrag2D(e);
       });
-      window.addEventListener("pointerup", () => {
+
+      const endDrag2D = () => {
+        drag2D = null;
         polyState.draggingPt = -1;
+      };
+      c2d.addEventListener("pointerup", endDrag2D);
+      c2d.addEventListener("pointercancel", endDrag2D);
+    }
+
+    // Two-way interactive dragging on the Complex Plane Radar (ℂ)
+    const cRadar = document.getElementById("complexRadarCanvas");
+    if (cRadar) {
+      let draggingRadar = false;
+      const updateFromRadarPointer = e => {
+        const rect = cRadar.getBoundingClientRect();
+        const scale = Math.min(rect.width, rect.height) / 5.4;
+        const re = (e.clientX - (rect.left + rect.width * 0.5)) / Math.max(1, scale);
+        const im = ((rect.top + rect.height * 0.5) - e.clientY) / Math.max(1, scale);
+        const c2 = Math.abs(polyState.c[2]) < 0.2 ? 1.0 : polyState.c[2];
+        // If dragging horizontally near real axis -> real roots (a0 <= 0); if dragging vertically -> imaginary roots (a0 > 0)
+        const signedR2 = Math.abs(im) > Math.abs(re) ? (im * im) : -(re * re);
+        const newC0 = Math.max(-2.5, Math.min(2.5, signedR2 * c2));
+        if (polyState.mode2d !== "anatomy") activate2DTab("anatomy");
+        polyState.c[0] = newC0;
+        sync2DSlidersFromState();
+        propagateFrom2D();
+        drawWindow1();
+        drawWindow2();
+      };
+      cRadar.addEventListener("pointerdown", e => {
+        draggingRadar = true;
+        try { cRadar.setPointerCapture(e.pointerId); } catch (_) {}
+        updateFromRadarPointer(e);
       });
+      cRadar.addEventListener("pointermove", e => {
+        if (!draggingRadar) return;
+        updateFromRadarPointer(e);
+      });
+      cRadar.addEventListener("pointerup", () => { draggingRadar = false; });
+      cRadar.addEventListener("pointercancel", () => { draggingRadar = false; });
     }
 
     document.querySelectorAll("[data-tab3d]").forEach(btn => {

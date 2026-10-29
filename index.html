@@ -140,8 +140,9 @@
 
       <div class="widget-story" data-i18n="w1_story"></div>
 
-      <div class="workbench-grid">
-        <!-- Left: 2D Canvas Viewport -->
+      <!-- Top Visual Row: Left = 2D Interactive Curve Canvas, Right = Full-Height Complex Plane Radar -->
+      <div class="w1-visual-grid">
+        <!-- Left: 2D Canvas Viewport (Grab any point on the curve to bend it directly!) -->
         <div class="canvas-viewport">
           <canvas id="plot2dCanvas"></canvas>
           <div class="canvas-top-bar">
@@ -153,125 +154,147 @@
           </div>
         </div>
 
-        <!-- Right: Controls + Complex Plane Radar -->
-        <div class="controls-box">
-          <!-- Tab 1: Anatomy (Monomials c0..c4) -->
-          <div id="panel2d_anatomy" class="panel-section">
-            <div class="section-head">
-              <span data-i18n="anat_title">Ползунки коэффициентов (Мономы):</span>
-              <label style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;cursor:pointer;color:var(--subtext);">
-                <input type="checkbox" id="chkShowMonomials" checked />
-                <span data-i18n="chk_mono">Показать отдельные степени</span>
-              </label>
-            </div>
+        <!-- Right: Live Complex Plane Root Radar (Full Height alongside 2D Canvas, also draggable!) -->
+        <div class="radar-card">
+          <div class="radar-header">
+            <span data-i18n="radar_title">🧭 Комплексная плоскость корней (ℂ) — Вид сверху на пол 3D-батута</span>
+            <button class="help-q" data-help="radar">?</button>
+          </div>
+          <div class="radar-canvas-wrap">
+            <canvas id="complexRadarCanvas"></canvas>
+          </div>
+          <div id="complexRootList" class="radar-root-list"></div>
+        </div>
+      </div>
 
-            <div class="slider-stack">
-              <div class="slider-row">
+      <!-- Bottom Full-Width Horizontal Controls Section (No Internal Scrollbar!) -->
+      <div class="controls-box">
+        <!-- Tab 1: Anatomy (Monomials c0..c4) -->
+        <div id="panel2d_anatomy" class="panel-section">
+          <div class="section-head">
+            <span data-i18n="anat_title">Ползунки коэффициентов (Мономы):</span>
+            <label class="inline-check-label">
+              <input type="checkbox" id="chkShowMonomials" checked />
+              <span data-i18n="chk_mono">Показать отдельные степени</span>
+            </label>
+          </div>
+
+          <div class="slider-grid">
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_c0">a₀ (сдвиг 1)</span>
-                <input type="range" id="slC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
-                <span id="valC0" class="mono">-1.00</span>
+                <span id="valC0" class="mono slider-val">-1.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_c1">a₁ · x (наклон)</span>
-                <input type="range" id="slC1" min="-2.5" max="2.5" step="0.05" value="0.0" />
-                <span id="valC1" class="mono">0.00</span>
+                <span id="valC1" class="mono slider-val">0.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slC1" min="-2.5" max="2.5" step="0.05" value="0.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_c2">a₂ · x² (чашка)</span>
-                <input type="range" id="slC2" min="-2.5" max="2.5" step="0.05" value="1.0" />
-                <span id="valC2" class="mono">1.00</span>
+                <span id="valC2" class="mono slider-val">1.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slC2" min="-2.5" max="2.5" step="0.05" value="1.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_c3">a₃ · x³ (S-изгиб)</span>
-                <input type="range" id="slC3" min="-2.0" max="2.0" step="0.05" value="0.0" />
-                <span id="valC3" class="mono">0.00</span>
+                <span id="valC3" class="mono slider-val">0.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slC3" min="-2.0" max="2.0" step="0.05" value="0.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_c4">a₄ · x⁴ (W-форма)</span>
-                <input type="range" id="slC4" min="-1.5" max="1.5" step="0.05" value="0.0" />
-                <span id="valC4" class="mono">0.00</span>
+                <span id="valC4" class="mono slider-val">0.00</span>
               </div>
-            </div>
-
-            <div class="chip-row">
-              <button class="chip-btn" data-preset2d="pdown" data-i18n="pre_pdown">Парабола (2 корня)</button>
-              <button class="chip-btn" data-preset2d="pup" data-i18n="pre_pup">Поднятая парабола (комплексные!)</button>
-              <button class="chip-btn" data-preset2d="cubic" data-i18n="pre_cubic">Кубическая волна</button>
-              <button class="chip-btn" data-preset2d="quartic" data-i18n="pre_quartic">W-Квартика</button>
+              <input type="range" id="slC4" min="-1.5" max="1.5" step="0.05" value="0.0" />
             </div>
           </div>
 
-          <!-- Tab 2: Roots Factored Form -->
-          <div id="panel2d_roots" class="panel-section hidden">
-            <div class="section-head" data-i18n="roots_title">Управление корнями: P(x) = a·(x − r₁)(x − r₂)(x − r₃)</div>
-            <p class="section-desc" data-i18n="roots_desc"></p>
-            <div class="slider-stack">
-              <div class="slider-row">
+          <div class="chip-row">
+            <button class="chip-btn" data-preset2d="pdown" data-i18n="pre_pdown">Парабола (2 корня)</button>
+            <button class="chip-btn" data-preset2d="pup" data-i18n="pre_pup">Поднятая парабола (комплексные!)</button>
+            <button class="chip-btn" data-preset2d="cubic" data-i18n="pre_cubic">Кубическая волна</button>
+            <button class="chip-btn" data-preset2d="quartic" data-i18n="pre_quartic">W-Квартика</button>
+          </div>
+        </div>
+
+        <!-- Tab 2: Roots Factored Form -->
+        <div id="panel2d_roots" class="panel-section hidden">
+          <div class="section-head" data-i18n="roots_title">Управление корнями: P(x) = a·(x − r₁)(x − r₂)(x − r₃)</div>
+          <p class="section-desc" data-i18n="roots_desc"></p>
+          <div class="slider-grid">
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_r1">Корень r₁</span>
-                <input type="range" id="slR1" min="-2.5" max="2.5" step="0.05" value="-1.5" />
-                <span id="valR1" class="mono">-1.50</span>
+                <span id="valR1" class="mono slider-val">-1.50</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slR1" min="-2.5" max="2.5" step="0.05" value="-1.5" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_r2">Корень r₂</span>
-                <input type="range" id="slR2" min="-2.5" max="2.5" step="0.05" value="0.2" />
-                <span id="valR2" class="mono">0.20</span>
+                <span id="valR2" class="mono slider-val">0.20</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slR2" min="-2.5" max="2.5" step="0.05" value="0.2" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_r3">Корень r₃</span>
-                <input type="range" id="slR3" min="-2.5" max="2.5" step="0.05" value="1.6" />
-                <span id="valR3" class="mono">1.60</span>
+                <span id="valR3" class="mono slider-val">1.60</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="slR3" min="-2.5" max="2.5" step="0.05" value="1.6" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_ra">Масштаб a</span>
-                <input type="range" id="slRA" min="-1.5" max="1.5" step="0.05" value="0.5" />
-                <span id="valRA" class="mono">0.50</span>
+                <span id="valRA" class="mono slider-val">0.50</span>
               </div>
+              <input type="range" id="slRA" min="-1.5" max="1.5" step="0.05" value="0.5" />
             </div>
-            <div id="rootsExpandedFormula" class="callout-box mono"></div>
           </div>
+          <div id="rootsExpandedFormula" class="callout-box mono"></div>
+        </div>
 
-          <!-- Tab 3: Taylor & Horner -->
-          <div id="panel2d_taylor" class="panel-section hidden">
-            <div class="section-head" data-i18n="taylor_title">Ряд Тейлора: как процессор считает sin(x) через полином</div>
-            <div class="slider-stack">
-              <div class="slider-row">
+        <!-- Tab 3: Taylor & Horner -->
+        <div id="panel2d_taylor" class="panel-section hidden">
+          <div class="section-head" data-i18n="taylor_title">Ряд Тейлора: как процессор считает sin(x) через полином</div>
+          <div class="slider-grid">
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_taylor_deg">Степень Тейлора</span>
-                <input type="range" id="slTaylorDeg" min="1" max="13" step="2" value="5" />
-                <span id="valTaylorDeg" class="mono">5</span>
+                <span id="valTaylorDeg" class="mono slider-val">5</span>
               </div>
+              <input type="range" id="slTaylorDeg" min="1" max="13" step="2" value="5" />
             </div>
-            <div class="section-head" data-i18n="horner_title">⚡ Схема Горнера (вложенные скобки для 4 умножений вместо 10):</div>
-            <div id="hornerStepsBox" class="callout-box mono"></div>
           </div>
+          <div class="section-head" data-i18n="horner_title">⚡ Схема Горнера (вложенные скобки для 4 умножений вместо 10):</div>
+          <div id="hornerStepsBox" class="callout-box mono"></div>
+        </div>
 
-          <!-- Tab 4: Bezier vs Lagrange -->
-          <div id="panel2d_bezier" class="panel-section hidden">
-            <div class="section-head" data-i18n="bezier_title">Сплайн Безье vs Интерполяция Лагранжа (тащи точки P₀..P₃ мышкой!)</div>
-            <div class="chip-row">
-              <button class="chip-btn active" data-curvemode="bezier" data-i18n="mode_bezier">Кривая Безье (мягкие магниты)</button>
-              <button class="chip-btn" data-curvemode="lagrange" data-i18n="mode_lagrange">Полином Лагранжа (прокол точек)</button>
-            </div>
-            <div class="slider-stack">
-              <div class="slider-row">
+        <!-- Tab 4: Bezier vs Lagrange -->
+        <div id="panel2d_bezier" class="panel-section hidden">
+          <div class="section-head" data-i18n="bezier_title">Сплайн Безье vs Интерполяция Лагранжа (тащи точки P₀..P₃ мышкой!)</div>
+          <div class="chip-row">
+            <button class="chip-btn active" data-curvemode="bezier" data-i18n="mode_bezier">Кривая Безье (мягкие магниты)</button>
+            <button class="chip-btn" data-curvemode="lagrange" data-i18n="mode_lagrange">Полином Лагранжа (прокол точек)</button>
+          </div>
+          <div class="slider-grid">
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_bezier_t">Параметр t</span>
-                <input type="range" id="slBezierT" min="0" max="1" step="0.01" value="0.45" />
-                <span id="valBezierT" class="mono">0.45</span>
+                <span id="valBezierT" class="mono slider-val">0.45</span>
               </div>
+              <input type="range" id="slBezierT" min="0" max="1" step="0.01" value="0.45" />
             </div>
-            <div id="curveExplainBox" class="callout-box" data-i18n="bezier_explain"></div>
           </div>
-
-          <!-- Live Complex Plane Root Radar (Always visible at bottom of Window #1 controls) -->
-          <div class="radar-card">
-            <div class="radar-header">
-              <span data-i18n="radar_title">🧭 Комплексная плоскость корней (ℂ) — Вид сверху на пол 3D-батута</span>
-              <button class="help-q" data-help="radar">?</button>
-            </div>
-            <div style="position:relative;width:100%;height:112px;border-radius:6px;overflow:hidden;border:1px solid var(--border);">
-              <canvas id="complexRadarCanvas" style="position:absolute;inset:0;width:100%!important;height:100%!important;display:block;"></canvas>
-            </div>
-            <div id="complexRootList" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
-          </div>
+          <div id="curveExplainBox" class="callout-box" data-i18n="bezier_explain"></div>
         </div>
       </div>
     </section>
@@ -314,57 +337,63 @@
 
       <div class="widget-story" data-i18n="w2_story"></div>
 
-      <div class="workbench-grid">
-        <!-- Left: 3D Canvas Viewport -->
-        <div class="canvas-viewport">
-          <canvas id="plot3dCanvas"></canvas>
-          <div class="canvas-top-bar">
-            <span class="widget-badge mono" data-i18n="badge_3d_info">Стеклянный пол: (x, iy) • Высота: |P(x+iy)| • Неоновый шов: 2D-мир (y=0)</span>
+      <!-- Top Full-Width 3D Canvas Viewport -->
+      <div class="canvas-viewport canvas-viewport-3d">
+        <canvas id="plot3dCanvas"></canvas>
+        <div class="canvas-top-bar">
+          <span class="widget-badge mono" data-i18n="badge_3d_info">Стеклянный пол: (x, iy) • Высота: |P(x+iy)| • Неоновый шов: 2D-мир (y=0)</span>
+          <button class="help-q" data-help="w2">?</button>
+        </div>
+        <div class="canvas-bottom-bar">
+          <span data-i18n="hint_3d_mouse">Мышь: вращение 3D-батута • Колесо: масштаб • Зелёные/розовые столбы: комплексные корни</span>
+        </div>
+      </div>
+
+      <!-- Bottom Full-Width Horizontal 3D Controls Section (No Internal Scrollbar!) -->
+      <div class="controls-box">
+        <div class="panel-section">
+          <div class="section-head">
+            <span data-i18n="w2_ctrl_title">Управление 3D-мостом (Связано с Окном #1 через Сцепление ⚙️)</span>
             <button class="help-q" data-help="w2">?</button>
           </div>
-          <div class="canvas-bottom-bar">
-            <span data-i18n="hint_3d_mouse">Мышь: вращение 3D-батута • Колесо: масштаб • Зелёные/розовые столбы: комплексные корни</span>
-          </div>
-        </div>
+          <p class="section-desc" data-i18n="w2_ctrl_desc"></p>
 
-        <!-- Right: 3D Bridge Controls -->
-        <div class="controls-box">
-          <div class="panel-section">
-            <div class="section-head">
-              <span data-i18n="w2_ctrl_title">Управление 3D-мостом (Связано с Окном #1 через Сцепление ⚙️)</span>
-              <button class="help-q" data-help="w2">?</button>
-            </div>
-            <p class="section-desc" data-i18n="w2_ctrl_desc"></p>
-
-            <div class="slider-stack">
-              <div class="slider-row">
+          <div class="slider-grid">
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_3d_c0">Лифт a₀ (высота)</span>
-                <input type="range" id="sl3dC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
-                <span id="val3dC0" class="mono">-1.00</span>
+                <span id="val3dC0" class="mono slider-val">-1.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="sl3dC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_3d_c2">Крутизна чашки a₂</span>
-                <input type="range" id="sl3dC2" min="0.2" max="2.2" step="0.05" value="1.0" />
-                <span id="val3dC2" class="mono">1.00</span>
+                <span id="val3dC2" class="mono slider-val">1.00</span>
               </div>
-              <div class="slider-row">
+              <input type="range" id="sl3dC2" min="0.2" max="2.2" step="0.05" value="1.0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-top">
                 <span data-i18n="sl_3d_slice">Срез по глубине y₀</span>
-                <input type="range" id="sl3dSlice" min="-1.8" max="1.8" step="0.05" value="0.0" />
-                <span id="val3dSlice" class="mono">0.00</span>
+                <span id="val3dSlice" class="mono slider-val">0.00</span>
               </div>
+              <input type="range" id="sl3dSlice" min="-1.8" max="1.8" step="0.05" value="0.0" />
             </div>
+          </div>
 
-            <div class="chip-row">
-              <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="checkbox" id="chk3dSlice" checked />
-                <span data-i18n="chk_slice">Показывать светящийся 2D-срез</span>
-              </label>
-              <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="checkbox" id="chk3dPillars" checked />
-                <span data-i18n="chk_pillars">Показывать маяки корней на полу</span>
-              </label>
-            </div>
+          <div class="chip-row">
+            <label class="inline-check-label">
+              <input type="checkbox" id="chk3dSlice" checked />
+              <span data-i18n="chk_slice">Показывать светящийся 2D-срез</span>
+            </label>
+            <label class="inline-check-label">
+              <input type="checkbox" id="chk3dPillars" checked />
+              <span data-i18n="chk_pillars">Показывать маяки корней на полу</span>
+            </label>
+          </div>
 
+          <div class="w2-bottom-callouts">
             <div class="callout-box" data-i18n="w2_tip_box"></div>
             <div id="w2LiveRootStatus" class="callout-box mono"></div>
           </div>
