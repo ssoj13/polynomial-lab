@@ -1713,6 +1713,84 @@ input[type="range"] {
   }
 }
 
+.manifold-lore-box {
+  margin-top: 4px;
+  padding: 16px 18px;
+  border-radius: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--mauve);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.widget-card.expanded .manifold-lore-box {
+  display: none;
+}
+
+.manifold-lore-header {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.manifold-lore-lead {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--subtext);
+  margin: 0;
+}
+
+.manifold-lore-lead b {
+  color: var(--fg);
+}
+
+.manifold-lore-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .manifold-lore-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.manifold-lore-card {
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: var(--bg-crust);
+  border: 1px solid var(--border);
+  font-size: 12.6px;
+  line-height: 1.58;
+  color: var(--subtext);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.manifold-lore-card b {
+  color: var(--fg);
+}
+
+.manifold-lore-card .lore-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.manifold-lore-card ul {
+  margin: 4px 0 2px 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* =========================================================================
  * DICTIONARY & [?] POPUP MODAL
  * ========================================================================= */
