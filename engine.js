@@ -2111,6 +2111,47 @@
     }
 
     window.addEventListener("resize", resizeAllCanvases);
+
+    // Interactive left/right corner resize handles for HUD cards (.hud-resizable)
+    document.querySelectorAll(".hud-card.hud-resizable").forEach(card => {
+      const isRightCol = !!card.closest(".hud-col-right");
+      const grip = document.createElement("span");
+      grip.className = "hud-resize-grip " + (isRightCol ? "grip-bl" : "grip-br");
+      grip.textContent = isRightCol ? "↙" : "↘";
+      grip.title = "Drag to resize table / Потяните для изменения размера";
+      card.appendChild(grip);
+
+      let resizing = false;
+      let startX = 0, startY = 0, startW = 0, startH = 0;
+      grip.addEventListener("pointerdown", e => {
+        e.stopPropagation();
+        e.preventDefault();
+        resizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = card.getBoundingClientRect();
+        startW = rect.width;
+        startH = rect.height;
+        grip.setPointerCapture(e.pointerId);
+      });
+      grip.addEventListener("pointermove", e => {
+        if (!resizing) return;
+        e.stopPropagation();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const newW = Math.max(250, Math.min(580, isRightCol ? startW - dx : startW + dx));
+        const newH = Math.max(82, Math.min(420, startH + dy));
+        card.style.width = `${Math.round(newW)}px`;
+        card.style.minHeight = `${Math.round(newH)}px`;
+      });
+      const stopResize = e => {
+        if (!resizing) return;
+        resizing = false;
+        try { grip.releasePointerCapture(e.pointerId); } catch (_) {}
+      };
+      grip.addEventListener("pointerup", stopResize);
+      grip.addEventListener("pointercancel", stopResize);
+    });
   }
 
   // --- MAIN LOOP & INIT ---
