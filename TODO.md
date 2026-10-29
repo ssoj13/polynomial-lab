@@ -1,0 +1,7 @@
+# `polynomial-lab` — Systemic Execution `TODO.md` (`/sysgo` + `/phd2`)
+
+- [x] **U1 (`styles.css`)**: Implement 5 official color themes (`Catppuccin Mocha`, `Tokyo Night`, `Rosé Pine`, `Gruvbox Dark`, `Rosé Pine Dawn`), 1980s JVC Hi-Fi tactile hardware buttons (chamfered bezel, icon-only Expand button, icon+LED red/green dot Clutch button, micro `[?]` button), and rock-solid `position: absolute; inset: 0` canvas viewport sizing so Expand/Collapse always restores exact dimensions.
+- [x] **U2 (`i18n.js`)**: Implement complete Trilingual SSOT Dictionary (`RU`, `EN`, `MN`) covering 100% of UI strings, **all slider labels** across Widgets #1, #2, #3, canvas badges, 3-step quest cards, all 12 `[?]` popups, and all 9 "No-Snobbery" dictionary cards.
+- [x] **U3 (`engine.js`)**: Implement Durand–Kerner complex root solver ($\mathbb{C}$), Master Clutch state machine (`w1`, `w2`, `w3`), Widget #1 (2D Canvas), Widget #2 (3D Bridge: $|P(x+iy)|$ trampoline with glowing 2D slice & root funnels + 3D Bézier surface patch), Widget #3 (4D WebGL2 Hopf/Calabi–Yau raymarcher + Poincaré section), and `data-i18n` SSOT binder.
+- [x] **U4 (`index.html`)**: Assemble clean semantic HTML with `data-i18n` attributes on every slider, button, tab, and badge; build standalone single-file bundle for chat artifact `polynomial_lab.html`.
+- [x] **U5 (Inquisitor Gate & Deploy)**: Run 7-Question Inquisitor Audit, verify JS syntax & zero missing `data-i18n` keys via automated script check, update `AGENTS.md`/`README.md`, commit, push to `ssoj13/polynomial-lab`, and verify GitHub Pages build.

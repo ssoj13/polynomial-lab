@@ -1,2330 +1,522 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="obsidian">
+<html lang="ru" data-theme="catppuccin">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>POLYNOMIAL LAB // Интерактивная лаборатория полиномов и многообразий</title>
-  <style>
-    :root,
-    [data-theme="obsidian"] {
-      --bg: #050814;
-      --bg-elev: #0b1124;
-      --card: rgba(11, 18, 38, 0.86);
-      --card-solid: #0d152c;
-      --canvas-bg: #040711;
-      --border: rgba(56, 189, 248, 0.25);
-      --border-strong: rgba(56, 189, 248, 0.55);
-      --fg: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.16);
-      --secondary: #e879f9;
-      --emerald: #34d399;
-      --amber: #fbbf24;
-      --grid-line: rgba(148, 163, 184, 0.08);
-      --axis-line: rgba(148, 163, 184, 0.35);
-      --shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
-    }
-
-    [data-theme="daylight"] {
-      --bg: #f4f6fb;
-      --bg-elev: #ffffff;
-      --card: rgba(255, 255, 255, 0.92);
-      --card-solid: #ffffff;
-      --canvas-bg: #f8fafc;
-      --border: rgba(37, 99, 235, 0.22);
-      --border-strong: rgba(37, 99, 235, 0.55);
-      --fg: #0f172a;
-      --muted: #475569;
-      --accent: #2563eb;
-      --accent-soft: rgba(37, 99, 235, 0.12);
-      --secondary: #db2777;
-      --emerald: #059669;
-      --amber: #d97706;
-      --grid-line: rgba(15, 23, 42, 0.07);
-      --axis-line: rgba(15, 23, 42, 0.35);
-      --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-    }
-
-    [data-theme="neon"] {
-      --bg: #07020f;
-      --bg-elev: #120524;
-      --card: rgba(19, 6, 38, 0.86);
-      --card-solid: #15072b;
-      --canvas-bg: #05010a;
-      --border: rgba(244, 114, 182, 0.32);
-      --border-strong: rgba(0, 245, 212, 0.65);
-      --fg: #fdf4ff;
-      --muted: #d8b4fe;
-      --accent: #00f5d4;
-      --accent-soft: rgba(0, 245, 212, 0.16);
-      --secondary: #ff2a85;
-      --emerald: #00f5d4;
-      --amber: #fee440;
-      --grid-line: rgba(244, 114, 182, 0.10);
-      --axis-line: rgba(0, 245, 212, 0.42);
-      --shadow: 0 14px 40px rgba(255, 42, 133, 0.22);
-    }
-
-    [data-theme="blueprint"] {
-      --bg: #061c36;
-      --bg-elev: #0a2749;
-      --card: rgba(8, 34, 66, 0.88);
-      --card-solid: #0a2950;
-      --canvas-bg: #051830;
-      --border: rgba(125, 211, 252, 0.32);
-      --border-strong: rgba(186, 230, 253, 0.72);
-      --fg: #f0f9ff;
-      --muted: #93c5fd;
-      --accent: #7dd3fc;
-      --accent-soft: rgba(125, 211, 252, 0.18);
-      --secondary: #fde047;
-      --emerald: #6ee7b7;
-      --amber: #fde047;
-      --grid-line: rgba(125, 211, 252, 0.14);
-      --axis-line: rgba(240, 249, 255, 0.48);
-      --shadow: 0 14px 36px rgba(2, 12, 27, 0.6);
-    }
-
-    [data-theme="steppe"] {
-      --bg: #120d07;
-      --bg-elev: #1d150c;
-      --card: rgba(31, 22, 12, 0.88);
-      --card-solid: #21170d;
-      --canvas-bg: #0e0a05;
-      --border: rgba(245, 158, 11, 0.28);
-      --border-strong: rgba(251, 191, 36, 0.65);
-      --fg: #fef3c7;
-      --muted: #d6bc8b;
-      --accent: #f59e0b;
-      --accent-soft: rgba(245, 158, 11, 0.18);
-      --secondary: #38bdf8;
-      --emerald: #34d399;
-      --amber: #fbbf24;
-      --grid-line: rgba(245, 158, 11, 0.09);
-      --axis-line: rgba(251, 191, 36, 0.38);
-      --shadow: 0 14px 36px rgba(0, 0, 0, 0.62);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      transition: background 0.22s ease, color 0.22s ease;
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-    }
-
-    .top-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 18px;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pulse-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: pulse 2.8s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(0.9); opacity: 0.65; }
-      50% { transform: scale(1.12); opacity: 1; }
-    }
-
-    .brand-title {
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.04em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .nav-pill {
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      background: transparent;
-      border: 1px solid transparent;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .nav-pill:hover {
-      color: var(--fg);
-      border-color: var(--border);
-      background: var(--accent-soft);
-    }
-
-    .top-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .theme-select {
-      padding: 5px 9px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--bg-elev);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      outline: none;
-    }
-
-    .lang-group {
-      display: inline-flex;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--border-strong);
-      background: var(--bg-elev);
-    }
-
-    .lang-btn {
-      padding: 5px 9px;
-      font-size: 12px;
-      font-weight: 700;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .lang-btn:hover {
-      color: var(--fg);
-    }
-
-    .lang-btn.active {
-      background: var(--accent);
-      color: #030712;
-    }
-
-    .btn-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--accent-soft);
-      color: var(--fg);
-      border: 1px solid var(--border-strong);
-      cursor: pointer;
-      transition: all 0.16s ease;
-    }
-
-    .btn-action:hover {
-      background: var(--accent);
-      color: #030712;
-    }
-
-    .container {
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 20px 18px 56px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
-
-    .hero-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 24px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      align-self: flex-start;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      background: var(--accent-soft);
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-    }
-
-    .hero-title {
-      font-size: 24px;
-      font-weight: 800;
-      line-height: 1.25;
-    }
-
-    .hero-sub {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 980px;
-    }
-
-    .widget-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: all 0.22s ease;
-    }
-
-    .widget-card.expanded {
-      position: fixed !important;
-      inset: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: none !important;
-      z-index: 200 !important;
-      border-radius: 0 !important;
-      background: var(--bg) !important;
-      padding: 14px 18px !important;
-      overflow: hidden !important;
-    }
-
-    .widget-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .widget-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .widget-num {
-      font-size: 12px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid var(--border-strong);
-    }
-
-    .widget-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .widget-tools {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tab-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .tab-btn {
-      padding: 6px 11px;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--bg-elev);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .tab-btn:hover {
-      color: var(--fg);
-      border-color: var(--border-strong);
-    }
-
-    .tab-btn.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .workbench-grid {
-      display: grid;
-      grid-template-columns: 7fr 5fr;
-      gap: 14px;
-      flex: 1;
-      min-height: 360px;
-    }
-
-    .widget-card.expanded .workbench-grid {
-      height: calc(100vh - 82px);
-    }
-
-    @media (max-width: 960px) {
-      .workbench-grid {
-        grid-template-columns: 1fr;
-      }
-      .widget-card.expanded {
-        overflow-y: auto !important;
-      }
-    }
-
-    .canvas-box {
-      position: relative;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--canvas-bg);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 350px;
-    }
-
-    #plot2dCanvas {
-      width: 100%;
-      height: 100%;
-      min-height: 350px;
-      display: block;
-      cursor: crosshair;
-      flex: 1;
-    }
-
-    .canvas-overlay-bottom {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(10px);
-      font-size: 12px;
-      pointer-events: none;
-    }
-
-    .canvas-overlay-top {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 6px;
-      z-index: 5;
-    }
-
-    .mini-btn {
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      background: var(--card);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      cursor: pointer;
-    }
-
-    .mini-btn:hover {
-      border-color: var(--accent);
-    }
-
-    .controls-box {
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg-elev);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .panel-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .panel-section.hidden {
-      display: none;
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .section-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .slider-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .slider-row {
-      display: grid;
-      grid-template-columns: 92px 1fr 48px;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      cursor: pointer;
-      accent-color: var(--accent);
-    }
-
-    .preset-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding-top: 6px;
-      border-top: 1px solid var(--border);
-    }
-
-    .chip-btn {
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--card);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.14s ease;
-    }
-
-    .chip-btn:hover,
-    .chip-btn.active {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-
-    .info-callout {
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      font-size: 12px;
-      line-height: 1.5;
-      color: var(--fg);
-    }
-
-    .manifold-viewport {
-      position: relative;
-      width: 100%;
-      height: 500px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: #02040a;
-    }
-
-    .widget-card.expanded .manifold-viewport {
-      height: calc(100vh - 150px);
-    }
-
-    #glManifoldCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: grab;
-    }
-
-    #glManifoldCanvas:active {
-      cursor: grabbing;
-    }
-
-    .hud-overlay-left {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      width: 270px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .hud-overlay-right {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 250px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    @media (max-width: 860px) {
-      .hud-overlay-right {
-        display: none;
-      }
-    }
-
-    .hud-box {
-      background: rgba(6, 10, 22, 0.78);
-      border: 1px solid rgba(56, 189, 248, 0.32);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 12px;
-      color: #e2e8f0;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    .hud-box-title {
-      font-weight: 700;
-      color: #38bdf8;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    #gaussRootsCanvas {
-      width: 100%;
-      height: 110px;
-      border-radius: 6px;
-      background: rgba(2, 5, 14, 0.75);
-      border: 1px solid rgba(232, 121, 249, 0.28);
-      display: block;
-    }
-
-    .manifold-controls-deck {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      font-size: 12px;
-    }
-
-    @media (max-width: 780px) {
-      .manifold-controls-deck {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .lesson-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    @media (max-width: 960px) {
-      .lesson-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .lesson-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .lesson-card h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .lesson-card p {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .formula-block {
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--fg);
-      overflow-x: auto;
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 18, 0.78);
-      backdrop-filter: blur(12px);
-      z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-backdrop.hidden {
-      display: none;
-    }
-
-    .modal-window {
-      max-width: 780px;
-      width: 100%;
-      max-height: 88vh;
-      overflow-y: auto;
-      background: var(--card-solid);
-      border: 1px solid var(--border-strong);
-      border-radius: 14px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-  </style>
+  <title>Polynomial Lab — 2D → 3D → 4D Interactive Visual Lesson</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
+  <!-- =======================================================================
+       STICKY TOP HEADER (JVC 1980s Hardware Bar + Master Clutch + Themes + Lang)
+       ======================================================================= -->
   <header class="top-header">
-    <div class="brand">
-      <span class="pulse-dot"></span>
-      <span id="uiBrandTitle" class="brand-title mono">POLYNOMIAL LAB // Ξ-MANIFOLD</span>
-      <nav class="nav-links">
-        <a href="#sec-lab2d" id="navLab1" class="nav-pill">#1: 2D Лаборатория</a>
-        <a href="#sec-manifold3d" id="navLab2" class="nav-pill">#2: 3D/4D Ξ-Многообразие</a>
-        <a href="#sec-lesson" id="navLesson" class="nav-pill">📖 Урок и Смысл</a>
+    <div class="brand-cluster">
+      <div class="brand-logo">
+        <span class="pulse-dot"></span>
+        <span data-i18n="brand">ЛАБОРАТОРИЯ ПОЛИНОМОВ: 2D → 3D → 4D</span>
+      </div>
+      <nav class="nav-pills">
+        <a href="#card2d" class="nav-pill" data-i18n="nav_w1">1. 2D Плоский мир</a>
+        <a href="#card3d" class="nav-pill" data-i18n="nav_w2">2. 3D Мост-батут</a>
+        <a href="#card4d" class="nav-pill" data-i18n="nav_w3">3. 4D Гиперпространство</a>
+        <a href="#dictSection" class="nav-pill" data-i18n="nav_dict">📖 Словарь на пальцах</a>
       </nav>
     </div>
 
-    <div class="top-controls">
-      <button id="btnOpenGuide" class="btn-action" title="Interactive Guide">
-        💡 <span id="uiBtnGuide">По-человечески</span>
+    <div class="top-actions">
+      <!-- Master Clutch (Icon ⚙️ + Red/Green LED Dot inside + [?] button) -->
+      <button id="btnMasterClutch" class="jvc-btn jvc-clutch-btn engaged" title="Master Clutch (2D ⇄ 3D ⇄ 4D)">
+        <span>⚙️</span>
+        <span class="jvc-led"></span>
       </button>
+      <button class="help-q" data-help="clutch" title="Что такое Сцепление (Clutch)?">?</button>
 
-      <select id="themeSelect" class="theme-select" aria-label="Visual Theme">
-        <option value="obsidian">🌑 Obsidian Dark</option>
-        <option value="daylight">☀️ Daylight Paper</option>
-        <option value="neon">⚡ Cyber Neon</option>
-        <option value="blueprint">📐 Blueprint CAD</option>
-        <option value="steppe">🏜️ Steppe Amber</option>
+      <!-- 5 Real Iconic Color Themes -->
+      <select id="themeSelect" class="theme-select" aria-label="Color Theme">
+        <option value="catppuccin">🎨 Catppuccin Mocha</option>
+        <option value="tokyonight">🌃 Tokyo Night</option>
+        <option value="rosepine">🌹 Rosé Pine</option>
+        <option value="gruvbox">🪵 Gruvbox Dark</option>
+        <option value="dawn">☀️ Rosé Pine Dawn</option>
       </select>
 
-      <div class="lang-group" role="group" aria-label="Language Switcher">
-        <button data-lang="en" class="lang-btn">EN</button>
-        <button data-lang="ru" class="lang-btn active">RU</button>
-        <button data-lang="mn" class="lang-btn">MN</button>
+      <!-- Trilingual Switcher (EN / RU / MN) -->
+      <div class="lang-group" role="group" aria-label="Language">
+        <button class="lang-btn" data-lang-btn="en">EN</button>
+        <button class="lang-btn active" data-lang-btn="ru">RU</button>
+        <button class="lang-btn" data-lang-btn="mn">MN</button>
       </div>
-
-      <button id="btnGlobalExpand" class="btn-action" title="Развернуть на всё окно (F)">
-        <span id="globalExpandIcon">⛶</span>
-        <span id="uiBtnExpand">На всё окно</span>
-      </button>
     </div>
   </header>
 
+  <!-- =======================================================================
+       MAIN WORKSPACE CONTAINER
+       ======================================================================= -->
   <main class="container">
+
+    <!-- HERO & 3-STEP INTERACTIVE QUEST -->
     <section class="hero-card">
-      <span id="uiHeroBadge" class="hero-badge">ИНТЕРАКТИВНЫЙ УРОК И ВЫЧИСЛИТЕЛЬНАЯ ЛАБОРАТОРИЯ</span>
-      <h1 id="uiHeroTitle" class="hero-title">Полиномы: от сложения и умножения до 3D-сплайнов и 4D-многообразий</h1>
-      <p id="uiHeroSub" class="hero-sub">
-        Полином — это универсальный конструктор функций, собранный только из сложения (+) и умножения (×). Именно поэтому процессоры вычисляют через них sin(x) и eˣ, графические движки строят из них кривые Безье, а в комплексной геометрии они задают 4D-многообразия Калаби—Яу и расслоения Хопфа.
-      </p>
+      <div class="hero-badge-row">
+        <span class="hero-badge" data-i18n="hero_badge">ИНТЕРАКТИВНЫЙ УЧЕБНИК • БЕЗ СНОБИЗМА • JVC 1980 HI-FI DECK</span>
+        <button class="jvc-btn" data-help="overview">
+          <span data-i18n="btn_how_it_works">❓ Как связаны все 3 окна?</span>
+        </button>
+      </div>
+      <h1 class="hero-title" data-i18n="hero_title">От школьной параболы до 4D-расслоений Хопфа и многообразий Калаби–Яу</h1>
+      <p class="hero-lead" data-i18n="hero_lead"></p>
+
+      <div class="quest-bar">
+        <button class="quest-btn active" data-quest="1">
+          <div class="quest-step-title" data-i18n="q1_title">Шаг 1. Поставь параболу на пол</div>
+          <div class="quest-step-desc" data-i18n="q1_desc"></div>
+        </button>
+        <button class="quest-btn" data-quest="2">
+          <div class="quest-step-title" data-i18n="q2_title">Шаг 2. Подними в воздух (Куда пропали корни?)</div>
+          <div class="quest-step-desc" data-i18n="q2_desc"></div>
+        </button>
+        <button class="quest-btn" data-quest="3">
+          <div class="quest-step-title" data-i18n="q3_title">Шаг 3. Запусти 4D-мотор</div>
+          <div class="quest-step-desc" data-i18n="q3_desc"></div>
+        </button>
+      </div>
     </section>
 
-    <section id="sec-lab2d" class="widget-card">
+    <!-- =====================================================================
+         WINDOW #1: 2D FLAT SHEET + COMPLEX PLANE RADAR
+         ===================================================================== -->
+    <section id="card2d" class="widget-card">
       <div class="widget-header">
-        <div class="widget-title-wrap">
-          <span class="widget-num">#1</span>
-          <h2 id="uiW1Title" class="widget-title">Конструктор Полиномов: Мономы, Корни, Ряд Тейлора и Кривые Безье</h2>
+        <div class="widget-title-group">
+          <span class="widget-badge" data-i18n="w1_badge">ОКНО #1 • 2D ПЛОСКИЙ МИР</span>
+          <h2 class="widget-title" data-i18n="w1_title">Геометрия кривой y = P(x) и Радар комплексных корней</h2>
+          <button class="help-q" data-help="w1">?</button>
         </div>
 
-        <div class="widget-tools">
-          <div class="tab-bar" id="w1Tabs">
-            <button data-tab="anatomy" id="tabAnatomy" class="tab-btn active">1. Анатомия (Мономы)</button>
-            <button data-tab="roots" id="tabRoots" class="tab-btn">2. Корни</button>
-            <button data-tab="taylor" id="tabTaylor" class="tab-btn">3. Тейлор (CPU)</button>
-            <button data-tab="bezier" id="tabBezier" class="tab-btn">4. Безье vs Лагранж</button>
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-tab2d="anatomy" data-i18n="tab_anatomy">1. Кирпичики</button>
+            <button class="tab-btn" data-tab2d="roots" data-i18n="tab_roots">2. Корни</button>
+            <button class="tab-btn" data-tab2d="taylor" data-i18n="tab_taylor">3. Тейлор & Горнер</button>
+            <button class="tab-btn" data-tab2d="bezier" data-i18n="tab_bezier">4. Безье vs Лагранж</button>
           </div>
 
-          <button data-expand="sec-lab2d" class="btn-action expand-widget-btn" title="Развернуть виджет #1 на всё окно">
-            <span>⛶</span> <span class="expand-label">Развернуть #1</span>
+          <!-- Per-Window Clutch (Icon ⚙️ + Red/Green LED Dot) -->
+          <button class="jvc-btn jvc-clutch-btn engaged" data-clutch="w1" title="Clutch Window #1">
+            <span>⚙️</span>
+            <span class="jvc-led"></span>
+          </button>
+
+          <!-- Pure Icon Expand Button (⛶) -->
+          <button class="jvc-btn jvc-icon-btn" data-expand="card2d" title="Expand / Collapse">
+            <span>⛶</span>
           </button>
         </div>
       </div>
+
+      <div class="widget-story" data-i18n="w1_story"></div>
 
       <div class="workbench-grid">
-        <div class="canvas-box">
-          <div class="canvas-overlay-top">
-            <button id="btnToggleDeriv" class="mini-btn" title="Показать производную P'(x)">d/dx P'(x)</button>
-            <button id="btnResetView2D" class="mini-btn" title="Сбросить масштаб">1:1</button>
+        <!-- Left: 2D Canvas Viewport -->
+        <div class="canvas-viewport">
+          <canvas id="plot2dCanvas"></canvas>
+          <div class="canvas-top-bar">
+            <span id="formulaReadout2D" class="widget-badge mono">P(x) = -1.00 + 1.00x²</span>
+            <button class="help-q" data-help="w1">?</button>
           </div>
-          <canvas id="plot2dCanvas" width="760" height="440"></canvas>
-          <div class="canvas-overlay-bottom mono">
-            <span id="formulaReadout" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">P(x) = 0.5x³ − 1.5x</span>
-            <span id="probeReadout" style="color:var(--accent);flex-shrink:0;">x = 0.00 | P(x) = 0.00</span>
+          <div class="canvas-bottom-bar">
+            <span id="realRootsBadge2D" class="mono">Вещественные корни: x = -1.00, 1.00</span>
           </div>
         </div>
 
+        <!-- Right: Controls + Complex Plane Radar -->
         <div class="controls-box">
-          <div id="panel-anatomy" class="panel-section">
-            <div class="section-title">
-              <span id="uiAnatTitle">Сумма степеней: P(x) = Σ aₖ·xᵏ</span>
-              <label style="display:flex;align-items:center;gap:5px;font-weight:500;cursor:pointer;">
-                <input type="checkbox" id="chkMonomials" checked />
-                <span id="uiChkMono">Гармоники</span>
+          <!-- Tab 1: Anatomy (Monomials c0..c4) -->
+          <div id="panel2d_anatomy" class="panel-section">
+            <div class="section-head">
+              <span data-i18n="anat_title">Ползунки коэффициентов (Мономы):</span>
+              <label style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;cursor:pointer;color:var(--subtext);">
+                <input type="checkbox" id="chkShowMonomials" checked />
+                <span data-i18n="chk_mono">Показать отдельные степени</span>
               </label>
             </div>
-            <p id="uiAnatDesc" class="section-desc">
-              Каждый коэффициент управляет своей степенью. Пунктирные линии показывают отдельные слагаемые aₖxᵏ, а сплошная линия — их сумму.
-            </p>
 
-            <div class="slider-list mono">
+            <div class="slider-stack">
               <div class="slider-row">
-                <span style="color:#fbbf24;">a₀ (сдвиг)</span>
-                <input type="range" id="c0" min="-3" max="3" step="0.1" value="0.0" />
-                <span id="v0" style="text-align:right;">0.0</span>
+                <span data-i18n="sl_c0">a₀ (сдвиг 1)</span>
+                <input type="range" id="slC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
+                <span id="valC0" class="mono">-1.00</span>
               </div>
               <div class="slider-row">
-                <span style="color:#34d399;">a₁·x (накл)</span>
-                <input type="range" id="c1" min="-3" max="3" step="0.1" value="-1.5" />
-                <span id="v1" style="text-align:right;">-1.5</span>
+                <span data-i18n="sl_c1">a₁ · x (наклон)</span>
+                <input type="range" id="slC1" min="-2.5" max="2.5" step="0.05" value="0.0" />
+                <span id="valC1" class="mono">0.00</span>
               </div>
               <div class="slider-row">
-                <span style="color:#c084fc;">a₂·x² (дуга)</span>
-                <input type="range" id="c2" min="-2" max="2" step="0.05" value="0.0" />
-                <span id="v2" style="text-align:right;">0.00</span>
+                <span data-i18n="sl_c2">a₂ · x² (чашка)</span>
+                <input type="range" id="slC2" min="-2.5" max="2.5" step="0.05" value="1.0" />
+                <span id="valC2" class="mono">1.00</span>
               </div>
               <div class="slider-row">
-                <span style="color:#f472b6;">a₃·x³ (S-изг)</span>
-                <input type="range" id="c3" min="-1" max="1" step="0.05" value="0.5" />
-                <span id="v3" style="text-align:right;">0.50</span>
+                <span data-i18n="sl_c3">a₃ · x³ (S-изгиб)</span>
+                <input type="range" id="slC3" min="-2.0" max="2.0" step="0.05" value="0.0" />
+                <span id="valC3" class="mono">0.00</span>
               </div>
               <div class="slider-row">
-                <span style="color:#38bdf8;">a₄·x⁴ (W-дно)</span>
-                <input type="range" id="c4" min="-0.5" max="0.5" step="0.02" value="0.0" />
-                <span id="v4" style="text-align:right;">0.00</span>
+                <span data-i18n="sl_c4">a₄ · x⁴ (W-форма)</span>
+                <input type="range" id="slC4" min="-1.5" max="1.5" step="0.05" value="0.0" />
+                <span id="valC4" class="mono">0.00</span>
               </div>
             </div>
 
-            <div class="preset-row">
-              <button data-preset="line" id="preLine" class="chip-btn">Прямая</button>
-              <button data-preset="parabola" id="preParabola" class="chip-btn">Парабола</button>
-              <button data-preset="cubic" id="preCubic" class="chip-btn">Кубическая S</button>
-              <button data-preset="quartic" id="preQuartic" class="chip-btn">Двугорбая W</button>
+            <div class="chip-row">
+              <button class="chip-btn" data-preset2d="pdown" data-i18n="pre_pdown">Парабола (2 корня)</button>
+              <button class="chip-btn" data-preset2d="pup" data-i18n="pre_pup">Поднятая парабола (комплексные!)</button>
+              <button class="chip-btn" data-preset2d="cubic" data-i18n="pre_cubic">Кубическая волна</button>
+              <button class="chip-btn" data-preset2d="quartic" data-i18n="pre_quartic">W-Квартика</button>
             </div>
           </div>
 
-          <div id="panel-roots" class="panel-section hidden">
-            <div class="section-title">
-              <span id="uiRootsTitle">Факторизация: P(x) = a(x − r₁)(x − r₂)(x − r₃)</span>
-            </div>
-            <p id="uiRootsDesc" class="section-desc">
-              Перетаскивайте оранжевые корни прямо по оси X мышкой! Когда два корня сливаются в одну точку, кривая лишь касается оси (кратный корень).
-            </p>
-            <div class="slider-list mono">
+          <!-- Tab 2: Roots Factored Form -->
+          <div id="panel2d_roots" class="panel-section hidden">
+            <div class="section-head" data-i18n="roots_title">Управление корнями: P(x) = a·(x − r₁)(x − r₂)(x − r₃)</div>
+            <p class="section-desc" data-i18n="roots_desc"></p>
+            <div class="slider-stack">
               <div class="slider-row">
-                <span>Корень r₁</span>
-                <input type="range" id="r1" min="-3.5" max="3.5" step="0.1" value="-2.0" />
-                <span id="vr1" style="text-align:right;">-2.0</span>
+                <span data-i18n="sl_r1">Корень r₁</span>
+                <input type="range" id="slR1" min="-2.5" max="2.5" step="0.05" value="-1.5" />
+                <span id="valR1" class="mono">-1.50</span>
               </div>
               <div class="slider-row">
-                <span>Корень r₂</span>
-                <input type="range" id="r2" min="-3.5" max="3.5" step="0.1" value="0.0" />
-                <span id="vr2" style="text-align:right;">0.0</span>
+                <span data-i18n="sl_r2">Корень r₂</span>
+                <input type="range" id="slR2" min="-2.5" max="2.5" step="0.05" value="0.2" />
+                <span id="valR2" class="mono">0.20</span>
               </div>
               <div class="slider-row">
-                <span>Корень r₃</span>
-                <input type="range" id="r3" min="-3.5" max="3.5" step="0.1" value="2.0" />
-                <span id="vr3" style="text-align:right;">2.0</span>
+                <span data-i18n="sl_r3">Корень r₃</span>
+                <input type="range" id="slR3" min="-2.5" max="2.5" step="0.05" value="1.6" />
+                <span id="valR3" class="mono">1.60</span>
               </div>
               <div class="slider-row">
-                <span>Масштаб a</span>
-                <input type="range" id="ra" min="-1.0" max="1.0" step="0.05" value="0.3" />
-                <span id="vra" style="text-align:right;">0.30</span>
+                <span data-i18n="sl_ra">Масштаб a</span>
+                <input type="range" id="slRA" min="-1.5" max="1.5" step="0.05" value="0.5" />
+                <span id="valRA" class="mono">0.50</span>
               </div>
             </div>
-            <div id="expandedRootsReadout" class="info-callout mono"></div>
+            <div id="rootsExpandedFormula" class="callout-box mono"></div>
           </div>
 
-          <div id="panel-taylor" class="panel-section hidden">
-            <div class="section-title">
-              <span id="uiTaylorTitle">Аппроксимация Тейлора и Схема Горнера</span>
+          <!-- Tab 3: Taylor & Horner -->
+          <div id="panel2d_taylor" class="panel-section hidden">
+            <div class="section-head" data-i18n="taylor_title">Ряд Тейлора: как процессор считает sin(x) через полином</div>
+            <div class="slider-stack">
+              <div class="slider-row">
+                <span data-i18n="sl_taylor_deg">Степень Тейлора</span>
+                <input type="range" id="slTaylorDeg" min="1" max="13" step="2" value="5" />
+                <span id="valTaylorDeg" class="mono">5</span>
+              </div>
             </div>
-            <p id="uiTaylorDesc" class="section-desc">
-              Процессор вычисляет тригонометрию и экспоненту через полиномы. Двигайте степень N и наблюдайте, как полином обнимает функцию!
-            </p>
-            <div class="preset-row" style="border-top:none;padding-top:0;">
-              <button data-fn="sin" class="chip-btn fn-btn active">sin(x)</button>
-              <button data-fn="cos" class="chip-btn fn-btn">cos(x)</button>
-              <button data-fn="exp" class="chip-btn fn-btn">eˣ</button>
-              <button data-fn="atan" class="chip-btn fn-btn">sin(x)+0.5cos(2x)</button>
-            </div>
-            <div class="slider-row mono">
-              <span id="uiTaylorDegLbl">Степень N:</span>
-              <input type="range" id="taylorDeg" min="1" max="13" step="1" value="5" />
-              <span id="vTaylorDeg" style="text-align:right;font-weight:700;color:var(--accent);">5</span>
-            </div>
-            <div class="info-callout mono">
-              <div id="uiHornerTitle" style="color:var(--muted);margin-bottom:4px;">Схема Горнера (FMA-конвейер CPU):</div>
-              <div id="hornerFormula" style="color:var(--emerald);word-break:break-all;"></div>
-            </div>
+            <div class="section-head" data-i18n="horner_title">⚡ Схема Горнера (вложенные скобки для 4 умножений вместо 10):</div>
+            <div id="hornerStepsBox" class="callout-box mono"></div>
           </div>
 
-          <div id="panel-bezier" class="panel-section hidden">
-            <div class="section-title">
-              <span id="uiBezierTitle">Кривые Безье (CG) vs Интерполяция Лагранжа</span>
+          <!-- Tab 4: Bezier vs Lagrange -->
+          <div id="panel2d_bezier" class="panel-section hidden">
+            <div class="section-head" data-i18n="bezier_title">Сплайн Безье vs Интерполяция Лагранжа (тащи точки P₀..P₃ мышкой!)</div>
+            <div class="chip-row">
+              <button class="chip-btn active" data-curvemode="bezier" data-i18n="mode_bezier">Кривая Безье (мягкие магниты)</button>
+              <button class="chip-btn" data-curvemode="lagrange" data-i18n="mode_lagrange">Полином Лагранжа (прокол точек)</button>
             </div>
-            <p id="uiBezierDesc" class="section-desc">
-              Перетаскивайте 4 опорные точки P₀..P₃ прямо на холсте мышкой!
-            </p>
-            <div class="preset-row" style="border-top:none;padding-top:0;">
-              <button data-curve="bezier" id="btnModeBezier" class="chip-btn curve-btn active">Кривая Безье (Бернштейн)</button>
-              <button data-curve="lagrange" id="btnModeLagrange" class="chip-btn curve-btn">Полином Лагранжа</button>
+            <div class="slider-stack">
+              <div class="slider-row">
+                <span data-i18n="sl_bezier_t">Параметр t</span>
+                <input type="range" id="slBezierT" min="0" max="1" step="0.01" value="0.45" />
+                <span id="valBezierT" class="mono">0.45</span>
+              </div>
             </div>
-            <div class="slider-row mono">
-              <span>Параметр t</span>
-              <input type="range" id="bezierT" min="0" max="1" step="0.01" value="0.45" />
-              <span id="vBezierT" style="text-align:right;">0.45</span>
-            </div>
-            <div id="curveExplainBox" class="info-callout">
-              Схема де Кастельжо строит точку на кривой Безье через линейные интерполяции (зелёные линии).
-            </div>
-            <button id="btnResetPts" class="chip-btn" style="align-self:flex-start;">Сбросить точки</button>
+            <div id="curveExplainBox" class="callout-box" data-i18n="bezier_explain"></div>
           </div>
 
-          <div style="padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span id="uiWheelHint">Колесо мыши — зум • Drag — панорама/точки</span>
-            <span class="mono">60 FPS</span>
+          <!-- Live Complex Plane Root Radar (Always visible at bottom of Window #1 controls) -->
+          <div class="radar-card">
+            <div class="radar-header">
+              <span data-i18n="radar_title">🧭 Комплексная плоскость корней (ℂ) — Вид сверху на пол 3D-батута</span>
+              <button class="help-q" data-help="radar">?</button>
+            </div>
+            <div style="position:relative;width:100%;height:112px;border-radius:6px;overflow:hidden;border:1px solid var(--border);">
+              <canvas id="complexRadarCanvas" style="position:absolute;inset:0;width:100%!important;height:100%!important;display:block;"></canvas>
+            </div>
+            <div id="complexRootList" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="sec-manifold3d" class="widget-card">
+    <!-- =====================================================================
+         WINDOW #2: 3D BRIDGE (MODULAR TRAMPOLINE |P(x+iy)| & 3D BEZIER WING)
+         ===================================================================== -->
+    <section id="card3d" class="widget-card">
       <div class="widget-header">
-        <div class="widget-title-wrap">
-          <span class="widget-num">#2</span>
-          <h2 id="uiW2Title" class="widget-title">3D/4D Алгебраическое Многообразие P(z) и Расслоение Хопфа [WebGL2]</h2>
+        <div class="widget-title-group">
+          <span class="widget-badge" data-i18n="w2_badge">ОКНО #2 • 3D ПРОМЕЖУТОЧНЫЙ МОСТ</span>
+          <h2 class="widget-title" data-i18n="w2_title">3D-Ландшафт модуля h(x,y) = |P(x + iy)| и 3D-Крыло Безье</h2>
+          <button class="help-q" data-help="w2">?</button>
         </div>
 
-        <div class="widget-tools">
-          <button data-mpreset="0" id="mp0" class="chip-btn active">Квинтика Калаби—Яу</button>
-          <button data-mpreset="1" id="mp1" class="chip-btn">Тор Хопфа S³ → S²</button>
-          <button data-mpreset="2" id="mp2" class="chip-btn">Комплексные Корни C</button>
-          <button id="btnSyncPoly" class="chip-btn" title="Связать с коэффициентами Виджета #1">🔗 Связь с #1: ВКЛ</button>
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-tab3d="trampoline" data-i18n="tab_3d_tramp">1. 3D-Батут |P(x+iy)|</button>
+            <button class="tab-btn" data-tab3d="bezier3d" data-i18n="tab_3d_bezier">2. 3D-Крыло Безье</button>
+          </div>
 
-          <button data-expand="sec-manifold3d" class="btn-action expand-widget-btn" title="Развернуть виджет #2 на всё окно">
-            <span>⛶</span> <span class="expand-label">Развернуть #2</span>
+          <button id="btnProfile3D" class="jvc-btn" data-i18n="btn_profile_3d">👁 Сбоку (2D-срез)</button>
+          <button id="btnResetCam3D" class="jvc-btn" data-i18n="btn_reset_cam">↺ Камера 3D</button>
+
+          <!-- Per-Window Clutch (Icon ⚙️ + Red/Green LED Dot) -->
+          <button class="jvc-btn jvc-clutch-btn engaged" data-clutch="w2" title="Clutch Window #2">
+            <span>⚙️</span>
+            <span class="jvc-led"></span>
+          </button>
+
+          <!-- Pure Icon Expand Button (⛶) -->
+          <button class="jvc-btn jvc-icon-btn" data-expand="card3d" title="Expand / Collapse">
+            <span>⛶</span>
           </button>
         </div>
       </div>
 
-      <div class="manifold-viewport">
+      <div class="widget-story" data-i18n="w2_story"></div>
+
+      <div class="workbench-grid">
+        <!-- Left: 3D Canvas Viewport -->
+        <div class="canvas-viewport">
+          <canvas id="plot3dCanvas"></canvas>
+          <div class="canvas-top-bar">
+            <span class="widget-badge mono" data-i18n="badge_3d_info">Стеклянный пол: (x, iy) • Высота: |P(x+iy)| • Неоновый шов: 2D-мир (y=0)</span>
+            <button class="help-q" data-help="w2">?</button>
+          </div>
+          <div class="canvas-bottom-bar">
+            <span data-i18n="hint_3d_mouse">Мышь: вращение 3D-батута • Колесо: масштаб • Зелёные/розовые столбы: комплексные корни</span>
+          </div>
+        </div>
+
+        <!-- Right: 3D Bridge Controls -->
+        <div class="controls-box">
+          <div class="panel-section">
+            <div class="section-head">
+              <span data-i18n="w2_ctrl_title">Управление 3D-мостом (Связано с Окном #1 через Сцепление ⚙️)</span>
+              <button class="help-q" data-help="w2">?</button>
+            </div>
+            <p class="section-desc" data-i18n="w2_ctrl_desc"></p>
+
+            <div class="slider-stack">
+              <div class="slider-row">
+                <span data-i18n="sl_3d_c0">Лифт a₀ (высота)</span>
+                <input type="range" id="sl3dC0" min="-2.5" max="2.5" step="0.05" value="-1.0" />
+                <span id="val3dC0" class="mono">-1.00</span>
+              </div>
+              <div class="slider-row">
+                <span data-i18n="sl_3d_c2">Крутизна чашки a₂</span>
+                <input type="range" id="sl3dC2" min="0.2" max="2.2" step="0.05" value="1.0" />
+                <span id="val3dC2" class="mono">1.00</span>
+              </div>
+              <div class="slider-row">
+                <span data-i18n="sl_3d_slice">Срез по глубине y₀</span>
+                <input type="range" id="sl3dSlice" min="-1.8" max="1.8" step="0.05" value="0.0" />
+                <span id="val3dSlice" class="mono">0.00</span>
+              </div>
+            </div>
+
+            <div class="chip-row">
+              <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="chk3dSlice" checked />
+                <span data-i18n="chk_slice">Показывать светящийся 2D-срез</span>
+              </label>
+              <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="chk3dPillars" checked />
+                <span data-i18n="chk_pillars">Показывать маяки корней на полу</span>
+              </label>
+            </div>
+
+            <div class="callout-box" data-i18n="w2_tip_box"></div>
+            <div id="w2LiveRootStatus" class="callout-box mono"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         WINDOW #3: 4D HYPERSPACE (HOPF FIBRATION & CALABI-YAU RAYMARCHER)
+         ===================================================================== -->
+    <section id="card4d" class="widget-card">
+      <div class="widget-header">
+        <div class="widget-title-group">
+          <span class="widget-badge" data-i18n="w3_badge">ОКНО #3 • 4D ГИПЕРПРОСТРАНСТВО (WEBGL2)</span>
+          <h2 class="widget-title" data-i18n="w3_title">Комплексная поверхность z₁ⁿ + z₂ⁿ = c, Расслоение Хопфа и Калаби–Яу</h2>
+          <button class="help-q" data-help="w3">?</button>
+        </div>
+
+        <div class="widget-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn active" data-preset4d="0" data-i18n="mp0">Расслоение Хопфа</button>
+            <button class="tab-btn" data-preset4d="1" data-i18n="mp1">Квинтика Калаби–Яу</button>
+            <button class="tab-btn" data-preset4d="2" data-i18n="mp2">Тороидальный узел</button>
+          </div>
+
+          <!-- Per-Window Clutch (Icon ⚙️ + Red/Green LED Dot) -->
+          <button class="jvc-btn jvc-clutch-btn engaged" data-clutch="w3" title="Clutch Window #3">
+            <span>⚙️</span>
+            <span class="jvc-led"></span>
+          </button>
+
+          <!-- Pure Icon Expand Button (⛶) -->
+          <button class="jvc-btn jvc-icon-btn" data-expand="card4d" title="Expand / Collapse">
+            <span>⛶</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="widget-story" data-i18n="w3_story"></div>
+
+      <div class="manifold-stage">
         <canvas id="glManifoldCanvas"></canvas>
 
-        <div class="hud-overlay-left mono">
-          <div class="hud-box">
-            <div class="hud-box-title">
-              <span id="uiHudSpinor">SO(4) АЛГЕБРАИЧЕСКИЙ ТЕНЗОР</span>
-              <span id="hudModeBadge" style="color:#f0abfc;">deg = 5</span>
+        <!-- Left HUD Column -->
+        <div class="hud-col-left">
+          <div class="hud-card">
+            <div class="hud-card-head">
+              <span data-i18n="hud_spinor">Вращение в 4D (SO(4))</span>
+              <button class="help-q" data-help="spinor">?</button>
             </div>
-            <div id="hudMatrix" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;color:#bae6fd;">
-              <span>P(z₁,z₂) = 0</span><span>χ = −200</span>
-              <span>CS(A) = +0.84i</span><span>∮ω = 2.00π</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <canvas id="spinorHudCanvas" width="64" height="64" style="width:64px;height:64px;flex-shrink:0;"></canvas>
+              <div class="mono" style="font-size:11.5px;line-height:1.5;">
+                <div><span data-i18n="hud_deg_lbl">Степень полинома:</span> <b id="hud4dDegVal" style="color:var(--accent);">n = 5</b></div>
+                <div id="hud4dClutchState" data-i18n="hud_clutch_on" style="color:var(--green);">Сцепление: ВКЛ (от 2D)</div>
+              </div>
             </div>
           </div>
 
-          <div class="hud-box">
-            <div class="hud-box-title">
-              <span id="uiHudGauss">КОМПЛЕКСНАЯ ПЛОСКОСТЬ КОРНЕЙ (ℂ)</span>
-              <span style="color:#34d399;">z = x + iy</span>
+          <div class="hud-card">
+            <div class="hud-card-head">
+              <span data-i18n="hud_poincare">Томограф (Сечение Пуанкаре ∂Ω)</span>
+              <button class="help-q" data-help="poincare">?</button>
             </div>
-            <canvas id="gaussRootsCanvas" width="240" height="110"></canvas>
+            <canvas id="poincareHudCanvas" width="240" height="84" style="width:100%;height:84px;display:block;"></canvas>
           </div>
         </div>
 
-        <div class="hud-overlay-right mono">
-          <div class="hud-box">
-            <div class="hud-box-title">
-              <span id="uiHudInv">ИНВАРИАНТЫ МНОГООБРАЗИЯ</span>
+        <!-- Right HUD Column -->
+        <div class="hud-col-right">
+          <div class="hud-card">
+            <div class="hud-card-head">
+              <span data-i18n="hud_inv">Паспорт 4D-фигуры (Инварианты)</span>
+              <button class="help-q" data-help="invariants">?</button>
             </div>
-            <div style="display:flex;flex-direction:column;gap:5px;color:#d1fae5;">
-              <div style="display:flex;justify-content:space-between;"><span>Σ zₖⁿ + P(z):</span><span id="invPoly">Quintic</span></div>
-              <div style="display:flex;justify-content:space-between;"><span>Кривизна Риччи:</span><span>R_μν = 0</span></div>
-              <div style="display:flex;justify-content:space-between;"><span>Лучевой шаг:</span><span>68 steps</span></div>
+            <div class="mono" style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span data-i18n="inv_eq_lbl">Уравнение:</span>
+                <b style="color:var(--mauve);">z₁ⁿ + z₂ⁿ − c = 0</b>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span data-i18n="inv_ricci_lbl">Кривизна Риччи:</span>
+                <b data-i18n="inv_ricci_val" style="color:var(--green);">0 (Баланс Калаби–Яу)</b>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span data-i18n="inv_slice_lbl">Граница среза:</span>
+                <b data-i18n="inv_slice_val" style="color:var(--accent);">3-Сфера S³ ⊂ ℂ²</b>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="manifold-controls-deck mono">
+      <!-- Bottom 4D Sliders (All bound with data-i18n + [?] help keys) -->
+      <div class="manifold-sliders">
         <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-            <span id="uiSlDeg">Степень многообразия (n)</span>
-            <span id="vMDeg" style="color:var(--accent);">5.0</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span data-i18n="sl_4d_deg">Лепестки (Степень n)</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;">
+              <b id="val4dDeg" class="mono">5.0</b>
+              <button class="help-q" data-help="sl_genus">?</button>
+            </span>
           </div>
-          <input type="range" id="mDeg" min="2" max="8" step="0.1" value="5.0" />
+          <input type="range" id="sl4dDeg" min="2.0" max="8.0" step="0.1" value="5.0" />
         </div>
+
         <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-            <span id="uiSlTorsion">Кручение Хопфа (Ξ)</span>
-            <span id="vMTorsion" style="color:var(--accent);">1.40</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span data-i18n="sl_4d_torsion">Закрутка волокон (Torsion)</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;">
+              <b id="val4dTorsion" class="mono">1.25</b>
+              <button class="help-q" data-help="sl_torsion">?</button>
+            </span>
           </div>
-          <input type="range" id="mTorsion" min="0" max="4" step="0.05" value="1.40" />
+          <input type="range" id="sl4dTorsion" min="0.1" max="3.5" step="0.05" value="1.25" />
         </div>
+
         <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-            <span id="uiSlFold">Полиномиальная складка (Ψ)</span>
-            <span id="vMFold" style="color:var(--accent);">0.65</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span data-i18n="sl_4d_fold">Поворот 4D-среза (W-угол)</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;">
+              <b id="val4dFold" class="mono">0.35</b>
+              <button class="help-q" data-help="sl_wshift">?</button>
+            </span>
           </div>
-          <input type="range" id="mFold" min="0" max="2" step="0.02" value="0.65" />
+          <input type="range" id="sl4dFold" min="0.0" max="1.0" step="0.01" value="0.35" />
         </div>
+
         <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-            <span id="uiSlDisp">Спектральная дисперсия (Ω)</span>
-            <span id="vMDisp" style="color:var(--accent);">1.15</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span data-i18n="sl_4d_disp">Спектральное свечение</span>
+            <b id="val4dDisp" class="mono">0.45</b>
           </div>
-          <input type="range" id="mDisp" min="0.1" max="3" step="0.05" value="1.15" />
+          <input type="range" id="sl4dDisp" min="0.0" max="1.2" step="0.02" value="0.45" />
         </div>
       </div>
     </section>
 
-    <section id="sec-lesson" class="lesson-grid">
-      <article class="lesson-card">
-        <h3 id="uiLes1Title">1. Почему только «+» и «×»? (Смысл для CPU и GPU)</h3>
-        <p id="uiLes1Body">
-          Транзисторы в процессоре и видеокарте умеют аппаратно складывать и умножать числа за один такт (инструкция FMA — Fused Multiply-Add). Любая сложная функция — синус, экспонента, гравитационный потенциал или тональная кривая — внутри компьютера раскладывается в полином и вычисляется матрёшкой по схеме Горнера.
-        </p>
-        <div class="formula-block mono">
-          P(x) = (((a₄·x + a₃)·x + a₂)·x + a₁)·x + a₀
-        </div>
-      </article>
-
-      <article class="lesson-card">
-        <h3 id="uiLes2Title">2. От корней на оси X до комплексного пространства ℂ</h3>
-        <p id="uiLes2Body">
-          По Основной теореме алгебры полином степени n всегда имеет ровно n корней! Если парабола x² + 1 не пересекает вещественную ось X, её корни никуда не исчезают — они переходят в комплексную плоскость (z = ±i). Именно их показывает радар корней во втором визуализаторе.
-        </p>
-        <div class="formula-block mono">
-          P(z) = aₙ(z − z₁)(z − z₂)…(z − zₙ),  zₖ ∈ ℂ
-        </div>
-      </article>
-
-      <article class="lesson-card">
-        <h3 id="uiLes3Title">3. Как полиномы создают 3D-сплайны и 4D-геометрию</h3>
-        <p id="uiLes3Body">
-          В компьютерной графике полиномы Бернштейна образуют гладкие кривые Безье и NURBS-поверхности. А в современной физике и топологии нули полиномов от нескольких комплексных переменных (∑ zₖ⁵ + ψ Π zₖ = 0) задают многообразия Калаби—Яу и расслоения Хопфа.
-        </p>
-        <div class="formula-block mono">
-          B(t) = (1−t)³P₀ + 3(1−t)²t P₁ + 3(1−t)t²P₂ + t³P₃
-        </div>
-      </article>
+    <!-- =====================================================================
+         PLAIN-LANGUAGE GLOSSARY ("FOR A 10-YEAR-OLD, NO SNOBBERY")
+         ===================================================================== -->
+    <section id="dictSection" class="dict-section">
+      <div class="hero-card">
+        <h2 class="hero-title" data-i18n="dict_heading">📖 Большой Словарь «На Пальцах» (Без заумных слов)</h2>
+        <p class="hero-lead" data-i18n="dict_sub"></p>
+      </div>
+      <div id="dictCardsContainer" class="dict-grid"></div>
     </section>
+
   </main>
 
-  <div id="guideModal" class="modal-backdrop hidden">
-    <div class="modal-window">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px;">
-        <h2 id="uiModalTitle" style="font-size:18px;font-weight:800;color:var(--accent);">💡 Полиномы «на пальцах» — зачем всё это нужно?</h2>
-        <button id="btnCloseGuide" class="btn-action">✕ ESC</button>
+  <!-- =======================================================================
+       INTERACTIVE [?] HELP POPUP MODAL
+       ======================================================================= -->
+  <div id="helpModalBackdrop" class="popup-backdrop hidden">
+    <div class="popup-card" role="dialog" aria-modal="true">
+      <div class="popup-head">
+        <div id="helpModalTitle" class="popup-title"></div>
+        <button id="btnCloseHelpModal" class="jvc-btn" data-i18n="btn_close_popup">Понятно ✕</button>
       </div>
-      <div id="uiModalBody" style="display:flex;flex-direction:column;gap:12px;font-size:13.5px;line-height:1.65;color:var(--fg);"></div>
+      <div class="popup-body">
+        <div class="popup-block">
+          <div class="popup-block-label" data-i18n="popup_b1">1. Что здесь нарисовано?</div>
+          <div id="helpModalB1"></div>
+        </div>
+        <div class="popup-block">
+          <div class="popup-block-label" data-i18n="popup_b2">2. Куда смотреть?</div>
+          <div id="helpModalB2"></div>
+        </div>
+        <div class="popup-block">
+          <div class="popup-block-label" data-i18n="popup_b3">3. Что меняется, когда двигаешь ползунки?</div>
+          <div id="helpModalB3"></div>
+        </div>
+      </div>
     </div>
   </div>
-  <script>
-    const I18N = {
-      ru: {
-        brand: "POLYNOMIAL LAB // Ξ-МНОГООБРАЗИЕ",
-        nav1: "#1: 2D Лаборатория",
-        nav2: "#2: 3D/4D Ξ-Многообразие",
-        nav3: "📖 Урок и Смысл",
-        guideBtn: "По-человечески",
-        expandBtn: "На всё окно",
-        collapseBtn: "Свернуть",
-        expandW1: "Развернуть #1",
-        expandW2: "Развернуть #2",
-        heroBadge: "ИНТЕРАКТИВНЫЙ УРОК И ВЫЧИСЛИТЕЛЬНАЯ ЛАБОРАТОРИЯ",
-        heroTitle: "Полиномы: от сложения и умножения до 3D-сплайнов и 4D-многообразий",
-        heroSub: "Полином — это универсальный конструктор функций, собранный только из сложения (+) и умножения (×). Именно поэтому процессоры вычисляют через них sin(x) и eˣ, графические движки строят из них кривые Безье, а в комплексной геометрии они задают 4D-многообразия Калаби—Яу и расслоения Хопфа.",
-        w1Title: "Конструктор Полиномов: Мономы, Корни, Ряд Тейлора и Кривые Безье",
-        tab1: "1. Анатомия (Мономы)",
-        tab2: "2. Корни",
-        tab3: "3. Тейлор (CPU)",
-        tab4: "4. Безье vs Лагранж",
-        anatTitle: "Сумма степеней: P(x) = Σ aₖ·xᵏ",
-        chkMono: "Гармоники",
-        anatDesc: "Каждый коэффициент управляет своей степенью. Пунктирные линии показывают отдельные слагаемые aₖxᵏ, а сплошная линия — их сумму.",
-        preLine: "Прямая",
-        preParabola: "Парабола",
-        preCubic: "Кубическая S",
-        preQuartic: "Двугорбая W",
-        rootsTitle: "Факторизация: P(x) = a(x − r₁)(x − r₂)(x − r₃)",
-        rootsDesc: "Перетаскивайте оранжевые корни прямо по оси X мышкой! Когда два корня сливаются в одну точку, кривая лишь касается оси (кратный корень).",
-        expandedPrefix: "Раскрытая форма: ",
-        taylorTitle: "Аппроксимация Тейлора и Схема Горнера",
-        taylorDesc: "Процессор вычисляет тригонометрию и экспоненту через полиномы. Двигайте степень N и наблюдайте, как полином обнимает функцию!",
-        taylorDegLbl: "Степень N:",
-        hornerTitle: "Схема Горнера (FMA-конвейер CPU):",
-        bezierTitle: "Кривые Безье (CG) vs Интерполяция Лагранжа",
-        bezierDesc: "Перетаскивайте 4 опорные точки P₀..P₃ прямо на холсте мышкой!",
-        modeBezier: "Кривая Безье (Бернштейн)",
-        modeLagrange: "Полином Лагранжа",
-        bezierExplain: "Кубическая кривая Безье строится из 4 полиномов Бернштейна 3-й степени: точки P₁ и P₂ работают как магниты, а зелёные отрезки показывают алгоритм де Кастельжо.",
-        lagrangeExplain: "Интерполяционный полином Лагранжа обязан пройти строго через все 4 точки, из-за чего возникают сильные выбросы (феномен Рунге).",
-        resetPts: "Сбросить точки",
-        wheelHint: "Колесо мыши — зум • Drag — панорама/точки",
-        w2Title: "3D/4D Алгебраическое Многообразие P(z) и Расслоение Хопфа [WebGL2]",
-        mp0: "Квинтика Калаби—Яу",
-        mp1: "Тор Хопфа S³ → S²",
-        mp2: "Комплексные Корни ℂ",
-        syncOn: "🔗 Связь с #1: ВКЛ",
-        syncOff: "🔗 Связь с #1: ВЫКЛ",
-        hudSpinor: "SO(4) АЛГЕБРАИЧЕСКИЙ ТЕНЗОР",
-        hudGauss: "КОМПЛЕКСНАЯ ПЛОСКОСТЬ КОРНЕЙ (ℂ)",
-        hudInv: "ИНВАРИАНТЫ МНОГООБРАЗИЯ",
-        slDeg: "Степень многообразия (n)",
-        slTorsion: "Кручение Хопфа (Ξ)",
-        slFold: "Полиномиальная складка (Ψ)",
-        slDisp: "Спектральная дисперсия (Ω)",
-        les1Title: "1. Почему только «+» и «×»? (Смысл для CPU и GPU)",
-        les1Body: "Транзисторы в процессоре и видеокарте умеют аппаратно складывать и умножать числа за один такт (инструкция FMA). Любая сложная функция — синус, экспонента, гравитационный потенциал — внутри компьютера раскладывается в полином и вычисляется матрёшкой по схеме Горнера.",
-        les2Title: "2. От корней на оси X до комплексного пространства ℂ",
-        les2Body: "По Основной теореме алгебры полином степени n всегда имеет ровно n корней! Если парабола x² + 1 не пересекает вещественную ось X, её корни переходят в комплексную плоскость (z = ±i). Именно их показывает радар корней во втором визуализаторе.",
-        les3Title: "3. Как полиномы создают 3D-сплайны и 4D-геометрию",
-        les3Body: "В компьютерной графике полиномы Бернштейна образуют гладкие кривые Безье и NURBS-поверхности. А в современной физике и топологии нули полиномов от нескольких комплексных переменных задают многообразия Калаби—Яу и расслоения Хопфа.",
-        modalTitle: "💡 Полиномы «на пальцах» — зачем всё это нужно?",
-        modalBody: `
-          <p><b>1. Что такое полином?</b> Представь конструктор LEGO, где у тебя есть кирпичики: плоский уровень (1), наклонная горка (x), чашка-парабола (x²), S-волна (x³) и W-чаша (x⁴). Меняя веса (коэффициенты aₖ) каждого кирпичика и складывая их вместе, ты можешь слепить практически любую гладкую форму.</p>
-          <p><b>2. Что показывает Визуализатор #1?</b> Здесь видны все 4 роли полинома в 2D: как он собирается из степеней, как привязывается к корням на оси X, как заменяет собой sin(x) в процессоре и как рисует кривые Безье в графике.</p>
-          <p><b>3. Что показывает Визуализатор #2?</b> Когда переменная становится комплексной (z = x + iy) или четырёхмерной на гиперсфере S³, полином превращается в трёхмерную светящуюся скульптуру — алгебраическое многообразие и расслоение Хопфа. Вращай его мышкой!</p>
-        `
-      },
-      en: {
-        brand: "POLYNOMIAL LAB // Ξ-MANIFOLD",
-        nav1: "#1: 2D Workbench",
-        nav2: "#2: 3D/4D Ξ-Manifold",
-        nav3: "📖 Lesson & Theory",
-        guideBtn: "Plain English",
-        expandBtn: "Full Window",
-        collapseBtn: "Collapse",
-        expandW1: "Expand #1",
-        expandW2: "Expand #2",
-        heroBadge: "INTERACTIVE LESSON & COMPUTATIONAL LABORATORY",
-        heroTitle: "Polynomials: From Addition & Multiplication to 3D Splines and 4D Manifolds",
-        heroSub: "A polynomial is the ultimate function builder crafted solely from addition (+) and multiplication (×). That is why CPUs evaluate sin(x) and eˣ through polynomials, 3D engines build Bézier splines from them, and complex geometry uses them to define 4D Calabi–Yau manifolds and Hopf fibrations.",
-        w1Title: "Polynomial Workbench: Monomials, Roots, Taylor Series & Bézier Splines",
-        tab1: "1. Anatomy (Monomials)",
-        tab2: "2. Roots",
-        tab3: "3. Taylor (CPU)",
-        tab4: "4. Bézier vs Lagrange",
-        anatTitle: "Sum of Powers: P(x) = Σ aₖ·xᵏ",
-        chkMono: "Harmonics",
-        anatDesc: "Each coefficient scales its power building block. Dashed curves show individual monomials aₖxᵏ, while the solid curve is their sum.",
-        preLine: "Line",
-        preParabola: "Parabola",
-        preCubic: "Cubic S-Wave",
-        preQuartic: "Quartic W-Well",
-        rootsTitle: "Factorization: P(x) = a(x − r₁)(x − r₂)(x − r₃)",
-        rootsDesc: "Drag the orange root handles directly along the X-axis! When two roots merge, the curve becomes tangent to the axis (a multiple root).",
-        expandedPrefix: "Expanded form: ",
-        taylorTitle: "Taylor Approximation & Horner's CPU Scheme",
-        taylorDesc: "CPUs compute trigonometry and exponentials via polynomials. Slide degree N to watch the Taylor polynomial hug the true function!",
-        taylorDegLbl: "Degree N:",
-        hornerTitle: "Horner's Scheme (CPU FMA pipeline):",
-        bezierTitle: "Bézier Curves (CG) vs Lagrange Interpolation",
-        bezierDesc: "Drag the 4 control points P₀..P₃ directly on the canvas!",
-        modeBezier: "Bézier Curve (Bernstein)",
-        modeLagrange: "Lagrange Polynomial",
-        bezierExplain: "A cubic Bézier curve blends 4 degree-3 Bernstein polynomials: P₁ and P₂ act as smooth magnets, while green segments show De Casteljau's subdivision.",
-        lagrangeExplain: "Lagrange interpolation forces the polynomial strictly through all 4 points, causing wild oscillations (Runge's phenomenon).",
-        resetPts: "Reset Points",
-        wheelHint: "Mouse wheel — zoom • Drag — pan / move points",
-        w2Title: "3D/4D Algebraic Manifold P(z) & Hopf Fibration [WebGL2]",
-        mp0: "Calabi–Yau Quintic",
-        mp1: "Hopf Torus S³ → S²",
-        mp2: "Complex Roots ℂ",
-        syncOn: "🔗 Link to #1: ON",
-        syncOff: "🔗 Link to #1: OFF",
-        hudSpinor: "SO(4) ALGEBRAIC TENSOR",
-        hudGauss: "COMPLEX ROOT GAUSS PLANE (ℂ)",
-        hudInv: "MANIFOLD INVARIANTS",
-        slDeg: "Manifold Degree (n)",
-        slTorsion: "Hopf Torsion (Ξ)",
-        slFold: "Polynomial Folding (Ψ)",
-        slDisp: "Spectral Dispersion (Ω)",
-        les1Title: "1. Why Only '+' and '×'? (CPU & GPU Hardware Truth)",
-        les1Body: "Transistors in CPUs and GPUs natively execute addition and multiplication in a single clock cycle (FMA — Fused Multiply-Add). Every transcendental function — sine, exponential, shading curve — is approximated by a polynomial and evaluated via Horner's nested scheme.",
-        les2Title: "2. From X-Axis Roots to the Complex Plane ℂ",
-        les2Body: "By the Fundamental Theorem of Algebra, a degree-n polynomial always has exactly n roots! When x² + 1 lifts above the real X-axis, its roots don't vanish — they move into the complex plane (z = ±i), tracked live in Visualizer #2.",
-        les3Title: "3. How Polynomials Shape 3D Splines & 4D Topology",
-        les3Body: "In computer graphics, Bernstein polynomials form smooth Bézier curves and NURBS surfaces. In geometry and physics, zero loci of multivariable complex polynomials define Calabi–Yau manifolds and Hopf fibrations.",
-        modalTitle: "💡 Polynomials in Plain English — Why Do They Matter?",
-        modalBody: `
-          <p><b>1. What is a polynomial?</b> Think of it as LEGO for math: you have a flat block (1), a ramp (x), a U-bowl (x²), an S-wave (x³), and a W-well (x⁴). By scaling and adding these blocks together, you can sculpt virtually any smooth curve.</p>
-          <p><b>2. What does Visualizer #1 show?</b> It reveals the 4 faces of polynomials in 2D: power harmonics, root factorization on the X-axis, how CPUs approximate sin(x), and how Bézier splines work in 3D/vector graphics.</p>
-          <p><b>3. What does Visualizer #2 show?</b> When variables become complex (z = x + iy) or live on the 4D hypersphere S³, a polynomial becomes a glowing 3D volumetric manifold. Drag with your mouse to orbit!</p>
-        `
-      },
-      mn: {
-        brand: "ОЛОН ГИШҮҮНТИЙН ЛАБОРАТОРИ // Ξ-ОЛОН ЯНЗ БАЙДАЛ",
-        nav1: "#1: 2D Лаборатори",
-        nav2: "#2: 3D/4D Ξ-Олон янз байдал",
-        nav3: "📖 Хичээл ба Утга",
-        guideBtn: "Энгийнээр тайлбарлах",
-        expandBtn: "Бүтэн дэлгэц",
-        collapseBtn: "Буцаах",
-        expandW1: "#1 Томруулах",
-        expandW2: "#2 Томруулах",
-        heroBadge: "ИНТЕРАКТИВ ХИЧЭЭЛ БА ТООЦООЛЛЫН ЛАБОРАТОРИ",
-        heroTitle: "Олон гишүүнт (Полином): Нэмэх, үржүүлэхээс 3D сплайн ба 4D огторгуй хүртэл",
-        heroSub: "Олон гишүүнт гэдэг нь зөвхөн нэмэх (+) болон үржүүлэх (×) үйлдлээр бүтээгддэг түгээмэл функцийн угсрагч юм. Тиймээс процессор sin(x), eˣ-ийг полиномоор бодож, 3D график хөдөлгүүрүүд Безье муруйг үүсгэж, комплекс геометрт Калаби—Яу олон янз байдлыг тодорхойлдог.",
-        w1Title: "Олон гишүүнтийн Лаборатори: Моном, Язгуур, Тейлорын цуваа ба Безье муруй",
-        tab1: "1. Бүтэц (Мономууд)",
-        tab2: "2. Язгуурууд",
-        tab3: "3. Тейлор (CPU)",
-        tab4: "4. Безье ба Лагранж",
-        anatTitle: "Зэрэгтүүдийн нийлбэр: P(x) = Σ aₖ·xᵏ",
-        chkMono: "Гармоникууд",
-        anatDesc: "Коэффициент бүр өөрийн зэрэгтийн гишүүнийг удирдана. Тасархай шугамууд нь aₖxᵏ гишүүдийг, үргэлжилсэн шугам нь нийлбэрийг харуулна.",
-        preLine: "Шулуун",
-        preParabola: "Парабол",
-        preCubic: "Куб S-долгион",
-        preQuartic: "4-р зэргийн W",
-        rootsTitle: "Үржигдэхүүн задаргаа: P(x) = a(x − r₁)(x − r₂)(x − r₃)",
-        rootsDesc: "Улбар шар цэгүүдийг X тэнхлэг дагуу хулганаар чирнэ үү! Хоёр язгуур давхцах үед муруй тэнхлэгийг шүргэнэ (давхар язгуур).",
-        expandedPrefix: "Задарсан хэлбэр: ",
-        taylorTitle: "Тейлорын ойролцоолол ба Горнерийн схем",
-        taylorDesc: "Процессор тригонометр ба илтгэгч функцийг олон гишүүнтээр боддог. N зэргийг ихэсгэж жинхэнэ функцтэй хэрхэн давхцахыг хараарай!",
-        taylorDegLbl: "Зэрэг N:",
-        hornerTitle: "Горнерийн схем (CPU FMA тооцоолол):",
-        bezierTitle: "Безье муруй (CG) ба Лагранжийн интерполяци",
-        bezierDesc: "4 тулгуур цэгийг (P₀..P₃) хулганаар шууд зөөж туршаарай!",
-        modeBezier: "Безье муруй (Бернштейн)",
-        modeLagrange: "Лагранжийн полином",
-        bezierExplain: "Куб Безье муруй нь 3-р зэргийн Бернштейний 4 олон гишүүнтээр үүсдэг: P₁ ба P₂ нь соронз мэт татаж, ногоон хэрчмүүд де Кастельжогийн алгоритмыг харуулна.",
-        lagrangeExplain: "Лагранжийн интерполяци бүх 4 цэгийг дайрах тул цэгүүдийн хооронд хүчтэй савалгаа (Рунгегийн үзэгдэл) үүсгэдэг.",
-        resetPts: "Цэгүүдийг сэргээх",
-        wheelHint: "Хулганы дугуй — томруулах • Чирэх — зөөх",
-        w2Title: "3D/4D Алгебрийн Олон Янз Байдал P(z) ба Хопфын Багцлал [WebGL2]",
-        mp0: "Калаби—Яу Квинтик",
-        mp1: "Хопфын Тор S³ → S²",
-        mp2: "Комплекс Язгуур ℂ",
-        syncOn: "🔗 #1-тэй холбох: АСААЛТТАЙ",
-        syncOff: "🔗 #1-тэй холбох: УНТРААЛТТАЙ",
-        hudSpinor: "SO(4) АЛГЕБРИЙН ТЕНЗОР",
-        hudGauss: "КОМПЛЕКС ЯЗГУУРЫН ХАВТГАЙ (ℂ)",
-        hudInv: "ОГТОРГУЙН ИНВАРИАНТУУД",
-        slDeg: "Олон гишүүнтийн зэрэг (n)",
-        slTorsion: "Хопфын мушгиралт (Ξ)",
-        slFold: "Полином нугалаа (Ψ)",
-        slDisp: "Спектрийн дисперс (Ω)",
-        les1Title: "1. Яагаад зөвхөн «+» ба «×» гэж? (CPU ба GPU-ийн утга)",
-        les1Body: "Процессорын транзисторууд нэг тактанд зөвхөн нэмэх ба үржүүлэх үйлдлийг (FMA команд) гүйцэтгэдэг. Аливаа нарийн функц — синус, экспонент, гэрлийн муруй — компьютерийн дотор олон гишүүнт болж Горнерийн схемээр бодогддог.",
-        les2Title: "2. X тэнхлэгийн язгуураас комплекс хавтгай (ℂ) хүртэл",
-        les2Body: "Алгебрийн үндсэн теоремоор n зэргийн олон гишүүнт яг n ширхэг язгууртай байна! Хэрэв парабол X тэнхлэгийг огтлохгүй бол түүний язгуурууд комплекс хавтгай руу (z = ±i) шилждэг.",
-        les3Title: "3. Олон гишүүнтээр 3D сплайн ба 4D геометр бүтээх нь",
-        les3Body: "Компьютер графикт Бернштейний олон гишүүнтүүд нь Безье муруй болон NURBS гадаргууг үүсгэдэг. Харин орчин үеийн физикт олон хувьсагчтай комплекс полиномын тэг цэгүүд нь Калаби—Яу огторгуйг тодорхойлдог.",
-        modalTitle: "💡 Олон гишүүнтийг энгийнээр — Яагаад чухал вэ?",
-        modalBody: `
-          <p><b>1. Олон гишүүнт гэж юу вэ?</b> Математикийн LEGO тоглоом гэж төсөөлөөрэй: хавтгай суурь (1), налуу (x), аяга хэлбэрт парабол (x²), S-долгион (x³), W-хотгор (x⁴). Эдгээрийг жингээр нь үржүүлээд нэмэхэд хүссэн гөлгөр муруйг бүтээж болно.</p>
-          <p><b>2. Визуализатор #1 юу харуулдаг вэ?</b> Олон гишүүнтийн 2D дахь 4 гол үүрэг: зэрэгтүүдийн нийлбэр, X тэнхлэг дээрх язгуурууд, процессор доторх Тейлорын ойролцоолол болон 3D графикийн Безье муруй.</p>
-          <p><b>3. Визуализатор #2 юу харуулдаг вэ?</b> Хувьсагч нь комплекс тоо (z = x + iy) эсвэл 4 хэмжээст S³ бөмбөрцөг дээрх спинор болоход олон гишүүнт нь гэрэлтсэн 3D огторгуйн бүтэц болж хувирна. Хулганаар эргүүлж шинжлээрэй!</p>
-        `
-      }
-    };
 
-    let currentLang = "ru";
-    let expandedWidgetId = null;
-    let activeTab = "anatomy";
-    let showMonomials = true;
-    let showDerivative = false;
-
-    const coeffs = [0.0, -1.5, 0.0, 0.5, 0.0];
-    const roots = [-2.0, 0.0, 2.0];
-    let rootScale = 0.3;
-    let taylorFn = "sin";
-    let taylorDeg = 5;
-    let curveMode = "bezier";
-    let bezierT = 0.45;
-    let syncPolyTo3D = true;
-
-    let controlPts = [
-      { x: -3.0, y: -1.8 },
-      { x: -1.2, y: 2.4 },
-      { x: 1.4, y: -2.2 },
-      { x: 3.0, y: 1.8 }
-    ];
-
-    let view2D = { cx: 0.0, cy: 0.0, spanX: 8.8, spanY: 6.4 };
-    let hoverWorld = null;
-    let dragState2D = null;
-
-    const canvas2d = document.getElementById("plot2dCanvas");
-    const ctx2d = canvas2d.getContext("2d");
-
-    function applyLanguage(lang) {
-      currentLang = lang;
-      document.documentElement.lang = lang;
-      const t = I18N[lang];
-      document.getElementById("uiBrandTitle").textContent = t.brand;
-      document.getElementById("navLab1").textContent = t.nav1;
-      document.getElementById("navLab2").textContent = t.nav2;
-      document.getElementById("navLesson").textContent = t.nav3;
-      document.getElementById("uiBtnGuide").textContent = t.guideBtn;
-      document.getElementById("uiBtnExpand").textContent = expandedWidgetId ? t.collapseBtn : t.expandBtn;
-      document.getElementById("uiHeroBadge").textContent = t.heroBadge;
-      document.getElementById("uiHeroTitle").textContent = t.heroTitle;
-      document.getElementById("uiHeroSub").textContent = t.heroSub;
-      document.getElementById("uiW1Title").textContent = t.w1Title;
-      document.getElementById("tabAnatomy").textContent = t.tab1;
-      document.getElementById("tabRoots").textContent = t.tab2;
-      document.getElementById("tabTaylor").textContent = t.tab3;
-      document.getElementById("tabBezier").textContent = t.tab4;
-      document.getElementById("uiAnatTitle").textContent = t.anatTitle;
-      document.getElementById("uiChkMono").textContent = t.chkMono;
-      document.getElementById("uiAnatDesc").textContent = t.anatDesc;
-      document.getElementById("preLine").textContent = t.preLine;
-      document.getElementById("preParabola").textContent = t.preParabola;
-      document.getElementById("preCubic").textContent = t.preCubic;
-      document.getElementById("preQuartic").textContent = t.preQuartic;
-      document.getElementById("uiRootsTitle").textContent = t.rootsTitle;
-      document.getElementById("uiRootsDesc").textContent = t.rootsDesc;
-      document.getElementById("uiTaylorTitle").textContent = t.taylorTitle;
-      document.getElementById("uiTaylorDesc").textContent = t.taylorDesc;
-      document.getElementById("uiTaylorDegLbl").textContent = t.taylorDegLbl;
-      document.getElementById("uiHornerTitle").textContent = t.hornerTitle;
-      document.getElementById("uiBezierTitle").textContent = t.bezierTitle;
-      document.getElementById("uiBezierDesc").textContent = t.bezierDesc;
-      document.getElementById("btnModeBezier").textContent = t.modeBezier;
-      document.getElementById("btnModeLagrange").textContent = t.modeLagrange;
-      document.getElementById("curveExplainBox").textContent = curveMode === "bezier" ? t.bezierExplain : t.lagrangeExplain;
-      document.getElementById("btnResetPts").textContent = t.resetPts;
-      document.getElementById("uiWheelHint").textContent = t.wheelHint;
-      document.getElementById("uiW2Title").textContent = t.w2Title;
-      document.getElementById("mp0").textContent = t.mp0;
-      document.getElementById("mp1").textContent = t.mp1;
-      document.getElementById("mp2").textContent = t.mp2;
-      document.getElementById("btnSyncPoly").textContent = syncPolyTo3D ? t.syncOn : t.syncOff;
-      document.getElementById("uiHudSpinor").textContent = t.hudSpinor;
-      document.getElementById("uiHudGauss").textContent = t.hudGauss;
-      document.getElementById("uiHudInv").textContent = t.hudInv;
-      document.getElementById("uiSlDeg").textContent = t.slDeg;
-      document.getElementById("uiSlTorsion").textContent = t.slTorsion;
-      document.getElementById("uiSlFold").textContent = t.slFold;
-      document.getElementById("uiSlDisp").textContent = t.slDisp;
-      document.getElementById("uiLes1Title").textContent = t.les1Title;
-      document.getElementById("uiLes1Body").textContent = t.les1Body;
-      document.getElementById("uiLes2Title").textContent = t.les2Title;
-      document.getElementById("uiLes2Body").textContent = t.les2Body;
-      document.getElementById("uiLes3Title").textContent = t.les3Title;
-      document.getElementById("uiLes3Body").textContent = t.les3Body;
-      document.getElementById("uiModalTitle").textContent = t.modalTitle;
-      document.getElementById("uiModalBody").innerHTML = t.modalBody;
-
-      document.querySelectorAll(".expand-widget-btn").forEach((btn) => {
-        const targetId = btn.dataset.expand;
-        const label = btn.querySelector(".expand-label");
-        if (expandedWidgetId === targetId) {
-          label.textContent = t.collapseBtn;
-        } else {
-          label.textContent = targetId === "sec-lab2d" ? t.expandW1 : t.expandW2;
-        }
-      });
-
-      document.querySelectorAll(".lang-btn").forEach((b) => {
-        b.classList.toggle("active", b.dataset.lang === lang);
-      });
-
-      draw2D();
-    }
-
-    document.querySelectorAll(".lang-btn").forEach((btn) => {
-      btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
-    });
-
-    document.getElementById("themeSelect").addEventListener("change", (e) => {
-      document.documentElement.setAttribute("data-theme", e.target.value);
-      draw2D();
-    });
-
-    function toggleExpandWidget(widgetId) {
-      const target = document.getElementById(widgetId);
-      if (!target) return;
-
-      if (expandedWidgetId === widgetId) {
-        target.classList.remove("expanded");
-        expandedWidgetId = null;
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
-        }
-      } else {
-        document.querySelectorAll(".widget-card.expanded").forEach((el) => el.classList.remove("expanded"));
-        target.classList.add("expanded");
-        expandedWidgetId = widgetId;
-      }
-
-      applyLanguage(currentLang);
-      setTimeout(() => {
-        resize2DCanvas();
-        resizeGLCanvas();
-      }, 40);
-    }
-
-    document.querySelectorAll(".expand-widget-btn").forEach((btn) => {
-      btn.addEventListener("click", () => toggleExpandWidget(btn.dataset.expand));
-    });
-
-    document.getElementById("btnGlobalExpand").addEventListener("click", () => {
-      if (expandedWidgetId) {
-        toggleExpandWidget(expandedWidgetId);
-      } else {
-        toggleExpandWidget("sec-lab2d");
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }
-      }
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        document.getElementById("guideModal").classList.add("hidden");
-        if (expandedWidgetId) toggleExpandWidget(expandedWidgetId);
-      } else if ((e.key === "f" || e.key === "F") && document.activeElement.tagName !== "INPUT") {
-        toggleExpandWidget(expandedWidgetId || "sec-lab2d");
-      }
-    });
-
-    document.getElementById("btnOpenGuide").addEventListener("click", () => {
-      document.getElementById("guideModal").classList.remove("hidden");
-    });
-    document.getElementById("btnCloseGuide").addEventListener("click", () => {
-      document.getElementById("guideModal").classList.add("hidden");
-    });
-
-    function resize2DCanvas() {
-      const rect = canvas2d.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.max(300, Math.floor(rect.width * dpr));
-      const h = Math.max(240, Math.floor(rect.height * dpr));
-      if (canvas2d.width !== w || canvas2d.height !== h) {
-        canvas2d.width = w;
-        canvas2d.height = h;
-      }
-      draw2D();
-    }
-
-    function worldToScreenX(x) {
-      return ((x - (view2D.cx - view2D.spanX * 0.5)) / view2D.spanX) * canvas2d.width;
-    }
-    function worldToScreenY(y) {
-      return canvas2d.height - ((y - (view2D.cy - view2D.spanY * 0.5)) / view2D.spanY) * canvas2d.height;
-    }
-    function screenToWorldX(px) {
-      return (view2D.cx - view2D.spanX * 0.5) + (px / canvas2d.width) * view2D.spanX;
-    }
-    function screenToWorldY(py) {
-      return (view2D.cy - view2D.spanY * 0.5) + ((canvas2d.height - py) / canvas2d.height) * view2D.spanY;
-    }
-
-    function evalPolyHorner(x) {
-      return (((coeffs[4] * x + coeffs[3]) * x + coeffs[2]) * x + coeffs[1]) * x + coeffs[0];
-    }
-
-    function evalPolyDeriv(x) {
-      return ((4 * coeffs[4] * x + 3 * coeffs[3]) * x + 2 * coeffs[2]) * x + coeffs[1];
-    }
-
-    function evalRootsPoly(x) {
-      return rootScale * (x - roots[0]) * (x - roots[1]) * (x - roots[2]);
-    }
-
-    function factorial(n) {
-      let r = 1;
-      for (let i = 2; i <= n; i++) r *= i;
-      return r;
-    }
-
-    function evalTaylorPoly(x) {
-      let s = 0;
-      for (let k = 0; k <= taylorDeg; k++) {
-        if (taylorFn === "exp") {
-          s += Math.pow(x, k) / factorial(k);
-        } else if (taylorFn === "sin") {
-          if (k % 2 === 1) {
-            const sign = ((k - 1) / 2) % 2 === 0 ? 1 : -1;
-            s += sign * Math.pow(x, k) / factorial(k);
-          }
-        } else if (taylorFn === "cos") {
-          if (k % 2 === 0) {
-            const sign = (k / 2) % 2 === 0 ? 1 : -1;
-            s += sign * Math.pow(x, k) / factorial(k);
-          }
-        } else {
-          if (k % 2 === 1) {
-            const sign = ((k - 1) / 2) % 2 === 0 ? 1 : -1;
-            s += sign * Math.pow(x, k) / factorial(k);
-          } else {
-            const sign = (k / 2) % 2 === 0 ? 1 : -1;
-            s += 0.5 * sign * Math.pow(2 * x, k) / factorial(k);
-          }
-        }
-      }
-      return s;
-    }
-
-    function evalTrueFunction(x) {
-      if (taylorFn === "sin") return Math.sin(x);
-      if (taylorFn === "cos") return Math.cos(x);
-      if (taylorFn === "exp") return Math.exp(x);
-      return Math.sin(x) + 0.5 * Math.cos(2 * x);
-    }
-
-    function evalLagrangePoly(x) {
-      let sum = 0;
-      for (let i = 0; i < 4; i++) {
-        let term = controlPts[i].y;
-        for (let j = 0; j < 4; j++) {
-          if (i !== j) {
-            const d = controlPts[i].x - controlPts[j].x;
-            if (Math.abs(d) < 1e-4) return 0;
-            term *= (x - controlPts[j].x) / d;
-          }
-        }
-        sum += term;
-      }
-      return sum;
-    }
-
-    function fmtCoeff(v, d = 2) {
-      const s = Number(v).toFixed(d).replace(/\.?0+$/, "");
-      return s === "-0" ? "0" : s;
-    }
-
-    function updateReadouts2D() {
-      const t = I18N[currentLang];
-      const formulaEl = document.getElementById("formulaReadout");
-
-      if (activeTab === "anatomy") {
-        const names = ["", "x", "x²", "x³", "x⁴"];
-        const parts = [];
-        for (let k = 4; k >= 0; k--) {
-          const c = coeffs[k];
-          if (Math.abs(c) < 1e-3) continue;
-          const sign = c >= 0 ? (parts.length ? " + " : "") : (parts.length ? " − " : "−");
-          const absC = Math.abs(c);
-          const cStr = absC === 1 && k > 0 ? "" : fmtCoeff(absC, 2);
-          parts.push(`${sign}${cStr}${names[k]}`);
-        }
-        formulaEl.textContent = "P(x) = " + (parts.length ? parts.join("") : "0");
-      } else if (activeTab === "roots") {
-        const fR = (r) => (r >= 0 ? `(x − ${fmtCoeff(r, 1)})` : `(x + ${fmtCoeff(-r, 1)})`);
-        formulaEl.textContent = `P(x) = ${fmtCoeff(rootScale, 2)}${fR(roots[0])}${fR(roots[1])}${fR(roots[2])}`;
-
-        const r1 = roots[0], r2 = roots[1], r3 = roots[2], a = rootScale;
-        const c3 = a;
-        const c2 = -a * (r1 + r2 + r3);
-        const c1 = a * (r1 * r2 + r2 * r3 + r1 * r3);
-        const c0 = -a * r1 * r2 * r3;
-        document.getElementById("expandedRootsReadout").textContent =
-          `${t.expandedPrefix}${fmtCoeff(c3)}x³ ${c2 >= 0 ? "+" : "−"} ${fmtCoeff(Math.abs(c2))}x² ${c1 >= 0 ? "+" : "−"} ${fmtCoeff(Math.abs(c1))}x ${c0 >= 0 ? "+" : "−"} ${fmtCoeff(Math.abs(c0))}`;
-      } else if (activeTab === "taylor") {
-        formulaEl.textContent = `T_${taylorDeg}(x) ≈ ${taylorFn}(x)  [${taylorDeg} FMA steps]`;
-        const hEl = document.getElementById("hornerFormula");
-        if (taylorFn === "sin") {
-          hEl.textContent = "x · (1 − x² · (1/6 − x² · (1/120 − x²/5040)))";
-        } else if (taylorFn === "cos") {
-          hEl.textContent = "1 − x² · (1/2 − x² · (1/24 − x²/720))";
-        } else {
-          hEl.textContent = "1 + x · (1 + x · (1/2 + x · (1/6 + x/24)))";
-        }
-      } else {
-        formulaEl.textContent =
-          curveMode === "bezier"
-            ? "B(t) = (1−t)³P₀ + 3(1−t)²t P₁ + 3(1−t)t²P₂ + t³P₃"
-            : "L(x) = Σ yᵢ · Π (x − xⱼ)/(xᵢ − xⱼ)";
-      }
-    }
-
-    function drawCurve2D(fn, color, lineWidth, dashed = false) {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      ctx2d.save();
-      ctx2d.strokeStyle = color;
-      ctx2d.lineWidth = lineWidth * dpr;
-      if (dashed) ctx2d.setLineDash([5 * dpr, 5 * dpr]);
-      ctx2d.beginPath();
-      let started = false;
-      const step = Math.max(2, Math.floor(2 * dpr));
-      for (let px = 0; px <= canvas2d.width; px += step) {
-        const x = screenToWorldX(px);
-        const y = fn(x);
-        if (!Number.isFinite(y) || Math.abs(y - view2D.cy) > view2D.spanY * 4) {
-          started = false;
-          continue;
-        }
-        const sy = worldToScreenY(y);
-        if (!started) {
-          ctx2d.moveTo(px, sy);
-          started = true;
-        } else {
-          ctx2d.lineTo(px, sy);
-        }
-      }
-      ctx2d.stroke();
-      ctx2d.restore();
-    }
-
-    function draw2D() {
-      const styles = getComputedStyle(document.documentElement);
-      const gridCol = styles.getPropertyValue("--grid-line").trim() || "rgba(148,163,184,0.1)";
-      const axisCol = styles.getPropertyValue("--axis-line").trim() || "rgba(148,163,184,0.4)";
-      const accentCol = styles.getPropertyValue("--accent").trim() || "#38bdf8";
-      const fgCol = styles.getPropertyValue("--fg").trim() || "#e2e8f0";
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
-
-      ctx2d.lineWidth = 1 * dpr;
-      ctx2d.strokeStyle = gridCol;
-      const xStart = Math.floor(view2D.cx - view2D.spanX * 0.5);
-      const xEnd = Math.ceil(view2D.cx + view2D.spanX * 0.5);
-      for (let gx = xStart; gx <= xEnd; gx++) {
-        const sx = worldToScreenX(gx);
-        ctx2d.beginPath();
-        ctx2d.moveTo(sx, 0);
-        ctx2d.lineTo(sx, canvas2d.height);
-        ctx2d.stroke();
-      }
-      const yStart = Math.floor(view2D.cy - view2D.spanY * 0.5);
-      const yEnd = Math.ceil(view2D.cy + view2D.spanY * 0.5);
-      for (let gy = yStart; gy <= yEnd; gy++) {
-        const sy = worldToScreenY(gy);
-        ctx2d.beginPath();
-        ctx2d.moveTo(0, sy);
-        ctx2d.lineTo(canvas2d.width, sy);
-        ctx2d.stroke();
-      }
-
-      ctx2d.strokeStyle = axisCol;
-      ctx2d.lineWidth = 1.6 * dpr;
-      const ox = worldToScreenX(0);
-      const oy = worldToScreenY(0);
-      ctx2d.beginPath();
-      ctx2d.moveTo(0, oy);
-      ctx2d.lineTo(canvas2d.width, oy);
-      ctx2d.moveTo(ox, 0);
-      ctx2d.lineTo(ox, canvas2d.height);
-      ctx2d.stroke();
-
-      if (activeTab === "anatomy") {
-        if (showMonomials) {
-          const mCols = ["#fbbf24", "#34d399", "#c084fc", "#f472b6", "#38bdf8"];
-          for (let k = 0; k <= 4; k++) {
-            if (Math.abs(coeffs[k]) < 1e-3) continue;
-            drawCurve2D((x) => coeffs[k] * Math.pow(x, k), mCols[k], 1.4, true);
-          }
-        }
-        if (showDerivative) {
-          drawCurve2D(evalPolyDeriv, "#f59e0b", 1.8, true);
-        }
-        drawCurve2D(evalPolyHorner, accentCol, 3.0, false);
-      } else if (activeTab === "roots") {
-        drawCurve2D(evalRootsPoly, accentCol, 3.0, false);
-        roots.forEach((r, idx) => {
-          const sx = worldToScreenX(r);
-          const sy = worldToScreenY(0);
-          ctx2d.fillStyle = "#f97316";
-          ctx2d.beginPath();
-          ctx2d.arc(sx, sy, 7 * dpr, 0, Math.PI * 2);
-          ctx2d.fill();
-          ctx2d.strokeStyle = "#ffffff";
-          ctx2d.lineWidth = 2 * dpr;
-          ctx2d.stroke();
-
-          ctx2d.fillStyle = fgCol;
-          ctx2d.font = `bold ${12 * dpr}px monospace`;
-          ctx2d.fillText(`r${idx + 1}`, sx - 7 * dpr, sy - 12 * dpr);
-        });
-      } else if (activeTab === "taylor") {
-        drawCurve2D(evalTrueFunction, "rgba(148,163,184,0.65)", 2.2, true);
-        drawCurve2D(evalTaylorPoly, "#10b981", 3.0, false);
-      } else if (activeTab === "bezier") {
-        if (curveMode === "bezier") {
-          ctx2d.save();
-          ctx2d.setLineDash([4 * dpr, 4 * dpr]);
-          ctx2d.strokeStyle = "rgba(148,163,184,0.45)";
-          ctx2d.lineWidth = 1.4 * dpr;
-          ctx2d.beginPath();
-          controlPts.forEach((p, i) => {
-            const sx = worldToScreenX(p.x), sy = worldToScreenY(p.y);
-            if (i === 0) ctx2d.moveTo(sx, sy);
-            else ctx2d.lineTo(sx, sy);
-          });
-          ctx2d.stroke();
-
-          const lerpPt = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
-          const q0 = lerpPt(controlPts[0], controlPts[1], bezierT);
-          const q1 = lerpPt(controlPts[1], controlPts[2], bezierT);
-          const q2 = lerpPt(controlPts[2], controlPts[3], bezierT);
-          const r0 = lerpPt(q0, q1, bezierT);
-          const r1 = lerpPt(q1, q2, bezierT);
-          const s0 = lerpPt(r0, r1, bezierT);
-
-          ctx2d.setLineDash([]);
-          ctx2d.strokeStyle = "rgba(52, 211, 153, 0.55)";
-          ctx2d.beginPath();
-          ctx2d.moveTo(worldToScreenX(q0.x), worldToScreenY(q0.y));
-          ctx2d.lineTo(worldToScreenX(q1.x), worldToScreenY(q1.y));
-          ctx2d.lineTo(worldToScreenX(q2.x), worldToScreenY(q2.y));
-          ctx2d.moveTo(worldToScreenX(r0.x), worldToScreenY(r0.y));
-          ctx2d.lineTo(worldToScreenX(r1.x), worldToScreenY(r1.y));
-          ctx2d.stroke();
-          ctx2d.restore();
-
-          ctx2d.save();
-          ctx2d.strokeStyle = "#ec4899";
-          ctx2d.lineWidth = 3.2 * dpr;
-          ctx2d.beginPath();
-          for (let i = 0; i <= 120; i++) {
-            const t = i / 120;
-            const u = 1 - t;
-            const x =
-              u * u * u * controlPts[0].x +
-              3 * u * u * t * controlPts[1].x +
-              3 * u * t * t * controlPts[2].x +
-              t * t * t * controlPts[3].x;
-            const y =
-              u * u * u * controlPts[0].y +
-              3 * u * u * t * controlPts[1].y +
-              3 * u * t * t * controlPts[2].y +
-              t * t * t * controlPts[3].y;
-            const sx = worldToScreenX(x), sy = worldToScreenY(y);
-            if (i === 0) ctx2d.moveTo(sx, sy);
-            else ctx2d.lineTo(sx, sy);
-          }
-          ctx2d.stroke();
-
-          ctx2d.fillStyle = "#34d399";
-          ctx2d.beginPath();
-          ctx2d.arc(worldToScreenX(s0.x), worldToScreenY(s0.y), 6 * dpr, 0, Math.PI * 2);
-          ctx2d.fill();
-          ctx2d.restore();
-        } else {
-          drawCurve2D(evalLagrangePoly, "#a855f7", 3.0, false);
-        }
-
-        controlPts.forEach((p, idx) => {
-          const sx = worldToScreenX(p.x), sy = worldToScreenY(p.y);
-          ctx2d.fillStyle = idx === 0 || idx === 3 ? "#38bdf8" : "#f59e0b";
-          ctx2d.beginPath();
-          ctx2d.arc(sx, sy, 7 * dpr, 0, Math.PI * 2);
-          ctx2d.fill();
-          ctx2d.strokeStyle = "#ffffff";
-          ctx2d.lineWidth = 2 * dpr;
-          ctx2d.stroke();
-
-          ctx2d.fillStyle = fgCol;
-          ctx2d.font = `bold ${12 * dpr}px monospace`;
-          ctx2d.fillText(`P${idx}`, sx + 9 * dpr, sy - 6 * dpr);
-        });
-      }
-
-      const probeEl = document.getElementById("probeReadout");
-      if (hoverWorld && activeTab !== "bezier") {
-        const fn =
-          activeTab === "anatomy"
-            ? evalPolyHorner
-            : activeTab === "roots"
-            ? evalRootsPoly
-            : evalTaylorPoly;
-        const y = fn(hoverWorld.x);
-        if (Number.isFinite(y)) {
-          const sx = worldToScreenX(hoverWorld.x);
-          const sy = worldToScreenY(y);
-          ctx2d.fillStyle = accentCol;
-          ctx2d.beginPath();
-          ctx2d.arc(sx, sy, 5 * dpr, 0, Math.PI * 2);
-          ctx2d.fill();
-          probeEl.textContent = `x = ${hoverWorld.x.toFixed(2)} | P(x) = ${y.toFixed(3)}`;
-        }
-      } else {
-        probeEl.textContent = `x ∈ [${(view2D.cx - view2D.spanX / 2).toFixed(1)}, ${(view2D.cx + view2D.spanX / 2).toFixed(1)}]`;
-      }
-
-      updateReadouts2D();
-    }
-
-    document.querySelectorAll("#w1Tabs .tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#w1Tabs .tab-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        activeTab = btn.dataset.tab;
-        ["anatomy", "roots", "taylor", "bezier"].forEach((id) => {
-          document.getElementById(`panel-${id}`).classList.toggle("hidden", id !== activeTab);
-        });
-        draw2D();
-      });
-    });
-
-    [0, 1, 2, 3, 4].forEach((k) => {
-      const s = document.getElementById(`c${k}`);
-      const v = document.getElementById(`v${k}`);
-      s.addEventListener("input", () => {
-        coeffs[k] = parseFloat(s.value);
-        v.textContent = coeffs[k].toFixed(k >= 2 ? 2 : 1);
-        draw2D();
-      });
-    });
-
-    document.getElementById("chkMonomials").addEventListener("change", (e) => {
-      showMonomials = e.target.checked;
-      draw2D();
-    });
-
-    document.getElementById("btnToggleDeriv").addEventListener("click", (e) => {
-      showDerivative = !showDerivative;
-      e.currentTarget.style.borderColor = showDerivative ? "var(--accent)" : "";
-      draw2D();
-    });
-
-    document.getElementById("btnResetView2D").addEventListener("click", () => {
-      view2D = { cx: 0.0, cy: 0.0, spanX: 8.8, spanY: 6.4 };
-      draw2D();
-    });
-
-    const presets2D = {
-      line: [0.4, 0.8, 0, 0, 0],
-      parabola: [-1.4, 0, 0.65, 0, 0],
-      cubic: [0, -1.5, 0, 0.5, 0],
-      quartic: [1.1, 0, -1.65, 0, 0.38]
-    };
-    document.querySelectorAll("[data-preset]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const vals = presets2D[btn.dataset.preset];
-        vals.forEach((val, k) => {
-          coeffs[k] = val;
-          document.getElementById(`c${k}`).value = val;
-          document.getElementById(`v${k}`).textContent = val.toFixed(k >= 2 ? 2 : 1);
-        });
-        draw2D();
-      });
-    });
-
-    [1, 2, 3].forEach((idx) => {
-      const s = document.getElementById(`r${idx}`);
-      const v = document.getElementById(`vr${idx}`);
-      s.addEventListener("input", () => {
-        roots[idx - 1] = parseFloat(s.value);
-        v.textContent = roots[idx - 1].toFixed(1);
-        draw2D();
-      });
-    });
-    document.getElementById("ra").addEventListener("input", (e) => {
-      rootScale = parseFloat(e.target.value);
-      document.getElementById("vra").textContent = rootScale.toFixed(2);
-      draw2D();
-    });
-
-    document.querySelectorAll(".fn-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".fn-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        taylorFn = btn.dataset.fn;
-        draw2D();
-      });
-    });
-    document.getElementById("taylorDeg").addEventListener("input", (e) => {
-      taylorDeg = parseInt(e.target.value, 10);
-      document.getElementById("vTaylorDeg").textContent = taylorDeg;
-      draw2D();
-    });
-
-    document.querySelectorAll(".curve-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".curve-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        curveMode = btn.dataset.curve;
-        applyLanguage(currentLang);
-      });
-    });
-    document.getElementById("bezierT").addEventListener("input", (e) => {
-      bezierT = parseFloat(e.target.value);
-      document.getElementById("vBezierT").textContent = bezierT.toFixed(2);
-      draw2D();
-    });
-    document.getElementById("btnResetPts").addEventListener("click", () => {
-      controlPts = [
-        { x: -3.0, y: -1.8 },
-        { x: -1.2, y: 2.4 },
-        { x: 1.4, y: -2.2 },
-        { x: 3.0, y: 1.8 }
-      ];
-      draw2D();
-    });
-
-    function getCanvas2DPos(e) {
-      const rect = canvas2d.getBoundingClientRect();
-      return {
-        px: ((e.clientX - rect.left) / rect.width) * canvas2d.width,
-        py: ((e.clientY - rect.top) / rect.height) * canvas2d.height
-      };
-    }
-
-    canvas2d.addEventListener("mousedown", (e) => {
-      const { px, py } = getCanvas2DPos(e);
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      if (activeTab === "roots") {
-        const sy = worldToScreenY(0);
-        for (let i = 0; i < 3; i++) {
-          const sx = worldToScreenX(roots[i]);
-          if (Math.hypot(px - sx, py - sy) < 16 * dpr) {
-            dragState2D = { type: "root", idx: i };
-            return;
-          }
-        }
-      } else if (activeTab === "bezier") {
-        for (let i = 0; i < 4; i++) {
-          const sx = worldToScreenX(controlPts[i].x);
-          const sy = worldToScreenY(controlPts[i].y);
-          if (Math.hypot(px - sx, py - sy) < 16 * dpr) {
-            dragState2D = { type: "pt", idx: i };
-            return;
-          }
-        }
-      }
-
-      dragState2D = {
-        type: "pan",
-        startPx: px,
-        startPy: py,
-        origCx: view2D.cx,
-        origCy: view2D.cy
-      };
-    });
-
-    canvas2d.addEventListener("mousemove", (e) => {
-      const { px, py } = getCanvas2DPos(e);
-      const wx = screenToWorldX(px);
-      const wy = screenToWorldY(py);
-      hoverWorld = { x: wx, y: wy };
-
-      if (dragState2D) {
-        if (dragState2D.type === "root") {
-          const clamped = Math.max(-3.5, Math.min(3.5, Math.round(wx * 10) / 10));
-          roots[dragState2D.idx] = clamped;
-          const idx = dragState2D.idx + 1;
-          document.getElementById(`r${idx}`).value = clamped;
-          document.getElementById(`vr${idx}`).textContent = clamped.toFixed(1);
-        } else if (dragState2D.type === "pt") {
-          controlPts[dragState2D.idx].x = Math.max(-4.0, Math.min(4.0, wx));
-          controlPts[dragState2D.idx].y = Math.max(-3.0, Math.min(3.0, wy));
-        } else if (dragState2D.type === "pan") {
-          const dx = ((px - dragState2D.startPx) / canvas2d.width) * view2D.spanX;
-          const dy = ((py - dragState2D.startPy) / canvas2d.height) * view2D.spanY;
-          view2D.cx = dragState2D.origCx - dx;
-          view2D.cy = dragState2D.origCy + dy;
-        }
-      }
-      draw2D();
-    });
-
-    window.addEventListener("mouseup", () => {
-      dragState2D = null;
-    });
-
-    canvas2d.addEventListener("mouseleave", () => {
-      hoverWorld = null;
-      draw2D();
-    });
-
-    canvas2d.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        const factor = e.deltaY > 0 ? 1.1 : 0.9;
-        view2D.spanX = Math.max(2.5, Math.min(24.0, view2D.spanX * factor));
-        view2D.spanY = Math.max(1.8, Math.min(18.0, view2D.spanY * factor));
-        draw2D();
-      },
-      { passive: false }
-    );
-
-    const glCanvas = document.getElementById("glManifoldCanvas");
-    const gl = glCanvas.getContext("webgl2", { antialias: false, depth: false, stencil: false });
-    const gaussCanvas = document.getElementById("gaussRootsCanvas");
-    const gCtx = gaussCanvas.getContext("2d");
-
-    let mDeg = 5.0;
-    let mTorsion = 1.4;
-    let mFold = 0.65;
-    let mDisp = 1.15;
-    let rot3D = { x: 0.45, y: 0.32 };
-    let zoom3D = 1.0;
-    let dragging3D = false;
-    let lastMouse3D = { x: 0, y: 0 };
-
-    function resizeGLCanvas() {
-      const rect = glCanvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
-      const w = Math.max(300, Math.floor(rect.width * dpr));
-      const h = Math.max(240, Math.floor(rect.height * dpr));
-      if (glCanvas.width !== w || glCanvas.height !== h) {
-        glCanvas.width = w;
-        glCanvas.height = h;
-      }
-    }
-
-    const vsSrc = `#version 300 es
-      in vec2 aPos;
-      out vec2 vUv;
-      void main() {
-        vUv = aPos;
-        gl_Position = vec4(aPos, 0.0, 1.0);
-      }
-    `;
-
-    const fsSrc = `#version 300 es
-      precision highp float;
-      in vec2 vUv;
-      out vec4 fragColor;
-
-      uniform vec2 uRes;
-      uniform float uTime;
-      uniform vec2 uRot;
-      uniform float uZoom;
-      uniform float uDeg;
-      uniform float uTorsion;
-      uniform float uFold;
-      uniform float uDisp;
-      uniform vec4 uPoly;
-
-      mat2 rot2(float a) {
-        float c = cos(a), s = sin(a);
-        return mat2(c, -s, s, c);
-      }
-
-      vec4 rotSO4(vec4 p, float alpha, float beta) {
-        float ca = cos(alpha), sa = sin(alpha);
-        float cb = cos(beta),  sb = sin(beta);
-        vec4 q = vec4(
-          ca * p.x - sa * p.y,
-          sa * p.x + ca * p.y,
-          cb * p.z - sb * p.w,
-          sb * p.z + cb * p.w
-        );
-        float cw = cos(alpha * 0.5), sw = sin(alpha * 0.5);
-        q.xz = mat2(cw, -sw, sw, cw) * q.xz;
-        return q;
-      }
-
-      vec2 polynomialManifoldField(vec3 p, float t) {
-        float polyMod = 0.12 * (uPoly.x + uPoly.y * p.x + uPoly.z * (p.x * p.x - p.y * p.y) + uPoly.w * p.z);
-        p += (uFold * 0.28 + polyMod) * sin(p.yzx * uDeg + t * 0.65);
-
-        float r2 = dot(p, p);
-        float invDenom = 1.0 / (1.0 + r2);
-        vec4 z = vec4(2.0 * p, r2 - 1.0) * invDenom;
-        z = rotSO4(z, t * 0.33, t * 0.21 * uTorsion);
-
-        float phi1 = atan(z.y, z.x);
-        float phi2 = atan(z.w, z.z);
-        float eta = atan(length(z.zw), length(z.xy));
-
-        float knotPhase = uDeg * phi1 - floor(uTorsion * 2.0 + 0.5) * phi2 + t * 0.95;
-        float targetEta = 0.785398 + (0.32 + 0.08 * uPoly.w) * sin(knotPhase);
-
-        float conformal = (1.0 + r2) * 0.5;
-        float dShell = abs(eta - targetEta) * conformal * 0.55;
-
-        float dualPhase = sin(uDeg * phi1 + uTorsion * phi2 * 2.0 - t * 0.75);
-        float dWeb = length(vec2(eta - 0.785398, dualPhase * 0.25)) * conformal * 0.52;
-
-        float dQuintic = abs(length(p) - 0.85 - 0.16 * cos(uDeg * phi1 + 4.0 * phi2)) * 0.58;
-        float d = min(dShell, dWeb);
-        d = mix(d, min(d, dQuintic), clamp(uFold * 0.65, 0.0, 1.0));
-
-        float spectralAngle = phi1 * 1.5 - phi2 * 1.5 + eta * 3.0 + polyMod * 4.0;
-        return vec2(d, spectralAngle);
-      }
-
-      vec3 palette(float x) {
-        vec3 a = vec3(0.50, 0.52, 0.58);
-        vec3 b = vec3(0.48, 0.45, 0.48);
-        vec3 c = vec3(1.00, 1.00, 1.00);
-        vec3 d = vec3(0.05, 0.33, 0.67);
-        return a + b * cos(6.28318 * (c * x + d));
-      }
-
-      void main() {
-        vec2 uv = (vUv * uRes) / min(uRes.x, uRes.y);
-        float t = uTime;
-
-        vec3 ro = vec3(0.0, 0.0, -3.35 / uZoom);
-        vec3 rd = normalize(vec3(uv, 1.45));
-
-        mat2 rx = rot2(uRot.y);
-        mat2 ry = rot2(uRot.x + t * 0.1);
-        ro.yz = rx * ro.yz;
-        rd.yz = rx * rd.yz;
-        ro.xz = ry * ro.xz;
-        rd.xz = ry * rd.xz;
-
-        vec3 col = vec3(0.01, 0.015, 0.038);
-        float dist = 0.2;
-        vec3 accum = vec3(0.0);
-
-        for (int i = 0; i < 68; i++) {
-          vec3 pos = ro + rd * dist;
-          vec2 res = polynomialManifoldField(pos, t);
-          float d = res.x;
-          float phase = res.y;
-
-          vec3 fiberCol = palette(phase * 0.15915 + uDisp * dist * 0.22 + t * 0.07);
-          float stepDist = max(abs(d) * 0.54, 0.016);
-          float density = exp(-abs(d) * 19.0) / (1.0 + dist * dist * 0.14);
-          float fringe = 0.65 + 0.35 * sin(phase * 4.0 + dist * 6.0 - t * 2.8);
-          accum += fiberCol * density * fringe * 0.058;
-
-          dist += stepDist;
-          if (dist > 7.6) break;
-        }
-
-        col += accum * (1.2 + uDisp * 0.42);
-        col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
-        col *= 1.0 - 0.22 * dot(vUv, vUv);
-        fragColor = vec4(pow(clamp(col, 0.0, 1.0), vec3(0.9)), 1.0);
-      }
-    `;
-
-    let glProg = null;
-    let uLocs = {};
-
-    if (gl) {
-      const compile = (type, src) => {
-        const s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        return s;
-      };
-      glProg = gl.createProgram();
-      gl.attachShader(glProg, compile(gl.VERTEX_SHADER, vsSrc));
-      gl.attachShader(glProg, compile(gl.FRAGMENT_SHADER, fsSrc));
-      gl.linkProgram(glProg);
-      gl.useProgram(glProg);
-
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
-      const aPos = gl.getAttribLocation(glProg, "aPos");
-      gl.enableVertexAttribArray(aPos);
-      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-      ["uRes", "uTime", "uRot", "uZoom", "uDeg", "uTorsion", "uFold", "uDisp", "uPoly"].forEach((name) => {
-        uLocs[name] = gl.getUniformLocation(glProg, name);
-      });
-    }
-
-    function drawGaussPlane(t) {
-      const w = gaussCanvas.width, h = gaussCanvas.height;
-      gCtx.clearRect(0, 0, w, h);
-
-      gCtx.strokeStyle = "rgba(56, 189, 248, 0.22)";
-      gCtx.lineWidth = 1;
-      gCtx.beginPath();
-      gCtx.moveTo(0, h / 2);
-      gCtx.lineTo(w, h / 2);
-      gCtx.moveTo(w / 2, 0);
-      gCtx.lineTo(w / 2, h);
-      gCtx.arc(w / 2, h / 2, 34, 0, Math.PI * 2);
-      gCtx.stroke();
-
-      const n = Math.max(2, Math.round(mDeg));
-      const shiftRe = syncPolyTo3D ? coeffs[0] * 0.15 : 0;
-      const shiftIm = syncPolyTo3D ? coeffs[1] * 0.15 : 0;
-      for (let k = 0; k < n; k++) {
-        const ang = (2 * Math.PI * k) / n + t * 0.35 * (mTorsion * 0.5) + shiftIm;
-        const rad = 32 * (1 + 0.18 * Math.sin(t + k * mFold));
-        const rx = w / 2 + Math.cos(ang) * rad + shiftRe * 18;
-        const ry = h / 2 + Math.sin(ang) * rad;
-
-        gCtx.fillStyle = k % 2 === 0 ? "#38bdf8" : "#e879f9";
-        gCtx.beginPath();
-        gCtx.arc(rx, ry, 4.2, 0, Math.PI * 2);
-        gCtx.fill();
-      }
-    }
-
-    function animateManifold(now) {
-      const t = now * 0.001;
-      if (gl && glProg) {
-        gl.viewport(0, 0, glCanvas.width, glCanvas.height);
-        gl.useProgram(glProg);
-        gl.uniform2f(uLocs.uRes, glCanvas.width, glCanvas.height);
-        gl.uniform1f(uLocs.uTime, t);
-        gl.uniform2f(uLocs.uRot, rot3D.x, rot3D.y);
-        gl.uniform1f(uLocs.uZoom, zoom3D);
-        gl.uniform1f(uLocs.uDeg, mDeg);
-        gl.uniform1f(uLocs.uTorsion, mTorsion);
-        gl.uniform1f(uLocs.uFold, mFold);
-        gl.uniform1f(uLocs.uDisp, mDisp);
-        if (syncPolyTo3D) {
-          gl.uniform4f(uLocs.uPoly, coeffs[0], coeffs[1], coeffs[2], coeffs[3]);
-        } else {
-          gl.uniform4f(uLocs.uPoly, 0, 0, 0, 0);
-        }
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-      }
-
-      drawGaussPlane(t);
-      requestAnimationFrame(animateManifold);
-    }
-
-    const bindMSlider = (id, vid, cb) => {
-      const el = document.getElementById(id);
-      const vel = document.getElementById(vid);
-      el.addEventListener("input", () => {
-        const val = parseFloat(el.value);
-        vel.textContent = val.toFixed(id === "mDeg" ? 1 : 2);
-        cb(val);
-        document.getElementById("hudModeBadge").textContent = `deg = ${mDeg.toFixed(1)}`;
-      });
-    };
-    bindMSlider("mDeg", "vMDeg", (v) => (mDeg = v));
-    bindMSlider("mTorsion", "vMTorsion", (v) => (mTorsion = v));
-    bindMSlider("mFold", "vMFold", (v) => (mFold = v));
-    bindMSlider("mDisp", "vMDisp", (v) => (mDisp = v));
-
-    const mPresets = [
-      { deg: 5.0, tor: 1.4, fold: 0.65, disp: 1.15, name: "Quintic" },
-      { deg: 3.0, tor: 2.0, fold: 0.25, disp: 0.85, name: "Hopf S³" },
-      { deg: 7.0, tor: 0.8, fold: 1.25, disp: 1.75, name: "Roots ℂ" }
-    ];
-    document.querySelectorAll("[data-mpreset]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("[data-mpreset]").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        const p = mPresets[parseInt(btn.dataset.mpreset, 10)];
-        mDeg = p.deg;
-        mTorsion = p.tor;
-        mFold = p.fold;
-        mDisp = p.disp;
-        document.getElementById("mDeg").value = mDeg;
-        document.getElementById("vMDeg").textContent = mDeg.toFixed(1);
-        document.getElementById("mTorsion").value = mTorsion;
-        document.getElementById("vMTorsion").textContent = mTorsion.toFixed(2);
-        document.getElementById("mFold").value = mFold;
-        document.getElementById("vMFold").textContent = mFold.toFixed(2);
-        document.getElementById("mDisp").value = mDisp;
-        document.getElementById("vMDisp").textContent = mDisp.toFixed(2);
-        document.getElementById("invPoly").textContent = p.name;
-        document.getElementById("hudModeBadge").textContent = `deg = ${mDeg.toFixed(1)}`;
-      });
-    });
-
-    document.getElementById("btnSyncPoly").addEventListener("click", () => {
-      syncPolyTo3D = !syncPolyTo3D;
-      applyLanguage(currentLang);
-    });
-
-    glCanvas.addEventListener("mousedown", (e) => {
-      dragging3D = true;
-      lastMouse3D = { x: e.clientX, y: e.clientY };
-    });
-    window.addEventListener("mousemove", (e) => {
-      if (!dragging3D) return;
-      rot3D.x += (e.clientX - lastMouse3D.x) * 0.007;
-      rot3D.y = Math.max(-1.5, Math.min(1.5, rot3D.y + (e.clientY - lastMouse3D.y) * 0.007));
-      lastMouse3D = { x: e.clientX, y: e.clientY };
-    });
-    window.addEventListener("mouseup", () => {
-      dragging3D = false;
-    });
-    glCanvas.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        zoom3D = Math.max(0.45, Math.min(2.8, zoom3D * (e.deltaY > 0 ? 0.92 : 1.08)));
-      },
-      { passive: false }
-    );
-
-    window.addEventListener("resize", () => {
-      resize2DCanvas();
-      resizeGLCanvas();
-    });
-
-    resize2DCanvas();
-    resizeGLCanvas();
-    applyLanguage("ru");
-    requestAnimationFrame(animateManifold);
-  </script>
+  <script src="i18n.js"></script>
+  <script src="engine.js"></script>
 </body>
 </html>

@@ -1,25 +1,31 @@
 # `polynomial-lab` — Local Agent Notebook
 
 ## Purpose
-Standalone zero-dependency interactive web laboratory and tutorial for polynomials, Horner's evaluation scheme, Taylor approximations, Bézier/Lagrange splines, and 3D/4D algebraic polynomial manifolds (`WebGL2` Hopf fibration & Calabi–Yau quintic raymarcher + Complex Gauss Root Plane), featuring a trilingual (`EN` / `RU` / `MN`) HUD, 5 visual themes, and full-window widget expansion.
+Modular, zero-external-dependency interactive web laboratory and visual lesson on **Polynomials (`2D → 3D → 4D`)**:
+1. **Window #1 (`2D Flat World`)**: $y = P(x)$ with 4 modes (Monomials/Anatomy, Factored Roots, Taylor Series & Horner's CPU scheme, Cubic Bézier vs Lagrange splines) + live **Complex Plane Root Radar ($\mathbb{C}$)** driven by a Durand–Kerner complex root solver.
+2. **Window #2 (`3D Bridge`)**: 3D modular surface ("rubber trampoline") $h(x, y) = |P(x + iy)|$ over the complex floor $(x, iy)$ with a glowing neon 2D slice at $y = 0$, complex root beacons/funnels touching $h = 0$, a `👁 Side Profile (2D Slice)` camera button, and a 3D Bicubic Bézier Wing mode.
+3. **Window #3 (`4D Hyperspace`)**: WebGL2 volumetric raymarcher of $z_1^n + z_2^n = c$, Hopf fibration ($\pi: S^3 \to S^2$), and Calabi–Yau quintic manifold with SO(4) spinor and Poincaré section $\partial\Omega$ HUDs.
+4. **1980s JVC Hi-Fi Hardware UI**: Tactile chamfered buttons, icon-only Expand button (`⛶` / `🗗`), Master & Per-Window Clutch (`⚙️`) with recessed emerald-green / ruby-red LED indicator dots (`.jvc-led`), 15 `[?]` help popups, 9 plain-language glossary cards, 5 official themes (`Catppuccin Mocha`, `Tokyo Night`, `Rosé Pine`, `Gruvbox Dark`, `Rosé Pine Dawn`), and 100% SSOT trilingual switching (`RU` / `EN` / `MN`).
 
 ## Dataflow
 ```
-[Top Bar: Theme Selector (5 Themes) | Language Toggle (EN/RU/MN) | Expand Toggle (⛶ / F)]
+[Top Header: Master Clutch ⚙️+LED | 5 Themes | EN / RU / MN Switcher]
        │
-       ├──► I18N Dictionary & CSS Variables ──► Live DOM HUD & Guide Modal
-       ├──► Visualizer #1 (2D Canvas)       ──► Monomials, Draggable Roots, Taylor/Horner, Bézier/Lagrange
-       └──► Visualizer #2 (WebGL2 + 2D HUD) ──► 68-Step Volumetric Algebraic Manifold + Gauss Root Plane (ℂ)
+       ├──► i18n.js (window.POLY_I18N) ──► 100% data-i18n DOM & Slider Labels + [?] Popups + 9 Glossary Cards
+       ├──► Window #1 (2D + ℂ Radar)   ──► Durand–Kerner Root Solver ──┐
+       ├──► Window #2 (3D Bridge)      ◄─── Clutch Coupling (⚙️+LED) ◄─┼──► 3-Step Interactive Quest
+       └──► Window #3 (4D WebGL2)      ◄─── Clutch Coupling (⚙️+LED) ◄─┘
 ```
 
 ## Traps
-- Keep `index.html` 100% self-contained with zero external CSS/JS runtime dependencies so GitHub Pages loads instantaneously and never suffers from third-party CDN blocks.
-- Always resize both 2D and WebGL2 canvases with `devicePixelRatio` clamping when toggling `.widget-card.expanded` (`100vw × 100vh`).
+- **Canvas Expand/Collapse Layout Trap**: Never allow `<canvas>` intrinsic `width`/`height` attributes to dictate flex/grid parent height, or collapsing a fullscreen widget will leave the window stretched. Keep `.canvas-viewport` / `.manifold-stage` at explicit heights (`430px` / `450px` in normal mode, `calc(100vh - ...)` in `.expanded`) and enforce `position: absolute; inset: 0; width: 100% !important; height: 100% !important;` on `<canvas>`.
+- **SSOT Language Binding on Sliders**: Every slider label (`sl_c0`..`sl_4d_disp`) must carry `data-i18n="sl_..."` so switching `EN`/`RU`/`MN` updates 100% of slider labels alongside tabs and headings.
 
 ## TODO
-- [x] M1: Create standalone `index.html`, trilingual `README.md` (`EN`/`RU`/`MN`), and `AGENTS.md`.
-- [x] M2: Update chat artifact `polynomial_lab.html` with full features.
-- [x] M3: Create GitHub repository `ssoj13/polynomial-lab`, push `main`, and enable GitHub Pages.
+- [x] M1: Create `styles.css`, `i18n.js`, `engine.js`, and `index.html` with 2D → 3D → 4D bridge, JVC 1980s hardware buttons, and 5 official color themes.
+- [x] M2: Bundle self-contained `polynomial_lab.html` artifact and pass automated Inquisitor verification (`91` `data-i18n` nodes, `15` `[?]` help buttons, `63` DOM IDs).
+- [x] M3: Push to `ssoj13/polynomial-lab` (`main`) and verify GitHub Pages deployment.
 
 ## Changelog
-- **2026-10-29**: Initial creation of `polynomial-lab` with Visualizer #1 (4-mode 2D Polynomial Workbench), Visualizer #2 (WebGL2 3D/4D Algebraic Manifold & Complex Gauss Root HUD), 5 visual themes, full-window expand toggles, and EN/RU/MN switcher.
+- **2026-10-29 (v2)**: Upgraded to 3-stage `2D → 3D → 4D` visual bridge (`styles.css`, `i18n.js`, `engine.js`, `index.html`), added 5 official themes (`Catppuccin Mocha`, `Tokyo Night`, `Rosé Pine`, `Gruvbox Dark`, `Rosé Pine Dawn`), JVC 1980s hardware buttons (`⛶` icon-only expand, `⚙️` clutch with green/red LED dot, `[?]` popups), fixed expand/collapse sizing bug, and bound 100% of slider labels to `data-i18n` (`RU`/`EN`/`MN`).
+- **2026-10-29 (v1)**: Initial creation of `polynomial-lab` repository and GitHub Pages deployment.
