@@ -1161,10 +1161,10 @@
         vec3 ro = vec3(0.0, 0.0, -3.35 / uZoom);
         vec3 rd = normalize(vec3(uv, 1.45));
 
-        // 1. Pitch around camera horizontal axis FIRST (no vertical inversion)
+        // 1. Pitch around camera horizontal axis FIRST (dy is top-down vs +Y bottom-up -> -uRot.y)
         mat2 rx = rot2(-uRot.y);
-        // 2. Yaw around world vertical axis SECOND
-        mat2 ry = rot2(-uRot.x - t * 0.1);
+        // 2. Yaw around world vertical axis SECOND (dx is left-right matching +X -> +uRot.x)
+        mat2 ry = rot2(uRot.x + t * 0.1);
         ro.yz = rx * ro.yz;
         rd.yz = rx * rd.yz;
         ro.xz = ry * ro.xz;
