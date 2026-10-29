@@ -28,8 +28,8 @@
   --shadow: 0 14px 36px rgba(17, 17, 27, 0.62);
   --jvc-face: linear-gradient(180deg, #383a4f 0%, #262738 100%);
   --jvc-face-hover: linear-gradient(180deg, #434660 0%, #2e3045 100%);
-  --jvc-bevel-top: rgba(255, 255, 255, 0.18);
-  --jvc-bevel-bot: rgba(0, 0, 0, 0.65);
+  --jvc-bevel-top: rgba(255, 255, 255, 0.09);
+  --jvc-bevel-bot: rgba(0, 0, 0, 0.36);
 }
 
 [data-theme="tokyonight"] {
@@ -56,8 +56,8 @@
   --shadow: 0 14px 36px rgba(10, 11, 16, 0.68);
   --jvc-face: linear-gradient(180deg, #2d324a 0%, #1e2233 100%);
   --jvc-face-hover: linear-gradient(180deg, #373d59 0%, #252a3f 100%);
-  --jvc-bevel-top: rgba(255, 255, 255, 0.16);
-  --jvc-bevel-bot: rgba(0, 0, 0, 0.7);
+  --jvc-bevel-top: rgba(255, 255, 255, 0.08);
+  --jvc-bevel-bot: rgba(0, 0, 0, 0.38);
 }
 
 [data-theme="rosepine"] {
@@ -84,8 +84,8 @@
   --shadow: 0 14px 36px rgba(10, 9, 16, 0.68);
   --jvc-face: linear-gradient(180deg, #332f4c 0%, #221f35 100%);
   --jvc-face-hover: linear-gradient(180deg, #3e395c 0%, #2a2640 100%);
-  --jvc-bevel-top: rgba(255, 255, 255, 0.16);
-  --jvc-bevel-bot: rgba(0, 0, 0, 0.68);
+  --jvc-bevel-top: rgba(255, 255, 255, 0.08);
+  --jvc-bevel-bot: rgba(0, 0, 0, 0.38);
 }
 
 [data-theme="gruvbox"] {
@@ -112,8 +112,8 @@
   --shadow: 0 14px 36px rgba(12, 12, 12, 0.65);
   --jvc-face: linear-gradient(180deg, #4a4542 0%, #322f2d 100%);
   --jvc-face-hover: linear-gradient(180deg, #57514e 0%, #3c3836 100%);
-  --jvc-bevel-top: rgba(255, 255, 255, 0.18);
-  --jvc-bevel-bot: rgba(0, 0, 0, 0.72);
+  --jvc-bevel-top: rgba(255, 255, 255, 0.09);
+  --jvc-bevel-bot: rgba(0, 0, 0, 0.40);
 }
 
 [data-theme="dawn"] {
@@ -140,8 +140,8 @@
   --shadow: 0 10px 28px rgba(87, 82, 121, 0.10);
   --jvc-face: linear-gradient(180deg, #ffffff 0%, #e8dfd5 100%);
   --jvc-face-hover: linear-gradient(180deg, #ffffff 0%, #ded3c6 100%);
-  --jvc-bevel-top: rgba(255, 255, 255, 0.9);
-  --jvc-bevel-bot: rgba(87, 82, 121, 0.35);
+  --jvc-bevel-top: rgba(255, 255, 255, 0.65);
+  --jvc-bevel-bot: rgba(87, 82, 121, 0.22);
 }
 
 * {
@@ -183,8 +183,8 @@ html, body {
   border-top: 1px solid var(--jvc-bevel-top);
   border-left: 1px solid var(--jvc-bevel-top);
   border-right: 1px solid var(--jvc-bevel-bot);
-  border-bottom: 2px solid var(--jvc-bevel-bot);
-  box-shadow: inset 0 1px 0 var(--jvc-bevel-top), 0 2px 4px rgba(0, 0, 0, 0.32);
+  border-bottom: 1px solid var(--jvc-bevel-bot);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
@@ -199,7 +199,7 @@ html, body {
 .jvc-btn:active,
 .jvc-btn.active {
   transform: translateY(1px);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
   border-bottom-width: 1px;
 }
 
@@ -212,22 +212,31 @@ html, body {
   flex-shrink: 0;
 }
 
-/* JVC Clutch Button (Icon ⚙️ + Recessed Red/Green LED Dot inside) */
+/* Square JVC Clutch Button (Only recessed Red/Green LED Dot inside, no gear icon) */
 .jvc-clutch-btn {
+  width: 32px;
   height: 32px;
-  padding: 0 9px;
-  gap: 7px;
+  padding: 0;
   position: relative;
+  flex-shrink: 0;
 }
 
 .jvc-led {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   display: inline-block;
-  border: 1px solid rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.55);
   transition: all 0.18s ease;
   flex-shrink: 0;
+}
+
+/* Right-aligned hardware button cluster inside widget headers */
+.widget-hw-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
 }
 
 .jvc-clutch-btn.engaged .jvc-led {
@@ -256,8 +265,8 @@ html, body {
   border-top: 1px solid var(--jvc-bevel-top);
   border-left: 1px solid var(--jvc-bevel-top);
   border-right: 1px solid var(--jvc-bevel-bot);
-  border-bottom: 2px solid var(--jvc-bevel-bot);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid var(--jvc-bevel-bot);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   flex-shrink: 0;
   pointer-events: auto;
@@ -357,7 +366,7 @@ html, body {
   border-top: 1px solid var(--jvc-bevel-top);
   border-left: 1px solid var(--jvc-bevel-top);
   border-right: 1px solid var(--jvc-bevel-bot);
-  border-bottom: 2px solid var(--jvc-bevel-bot);
+  border-bottom: 1px solid var(--jvc-bevel-bot);
   cursor: pointer;
   outline: none;
 }
@@ -480,7 +489,7 @@ html, body {
   border-top: 1px solid var(--jvc-bevel-top);
   border-left: 1px solid var(--jvc-bevel-top);
   border-right: 1px solid var(--jvc-bevel-bot);
-  border-bottom: 2px solid var(--jvc-bevel-bot);
+  border-bottom: 1px solid var(--jvc-bevel-bot);
   color: var(--fg);
   cursor: pointer;
   transition: all 0.14s ease;
@@ -573,8 +582,10 @@ html, body {
 .widget-toolbar {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 7px;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .tab-group {
@@ -783,7 +794,7 @@ input[type="range"] {
   border-top: 1px solid var(--jvc-bevel-top);
   border-left: 1px solid var(--jvc-bevel-top);
   border-right: 1px solid var(--jvc-bevel-bot);
-  border-bottom: 2px solid var(--jvc-bevel-bot);
+  border-bottom: 1px solid var(--jvc-bevel-bot);
   cursor: pointer;
   transition: all 0.12s ease;
   display: inline-flex;
@@ -992,7 +1003,9 @@ input[type="range"] {
 }
 
 .popup-card {
-  max-width: 640px;
+  max-width: 760px;
+  max-height: 88vh;
+  overflow-y: auto;
   width: 100%;
   background: var(--bg-mantle);
   border: 2px solid var(--accent);

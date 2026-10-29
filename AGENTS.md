@@ -18,6 +18,7 @@ Modular, zero-external-dependency interactive web laboratory and visual lesson o
 ```
 
 ## Traps
+- **4D Raymarcher Camera Orbit Order & Y-Axis Sign Trap**: In GLSL `map4D(vec3 p)`, `p` starts in Camera Space (`ro + rd * t`). Never apply world yaw `p.xz *= rot(uRot.x)` *before* camera pitch `p.yz`, or pitch will rotate around the spinning object's local X-axis (inverting up/down every 180° of yaw/time and turning vertical drag into roll at 90°). Always apply camera pitch first (`p.yz *= rot(-uRot.y)` with `-uRot.y` to map DOM `clientY` down-positive to WebGL NDC `vUv.y` up-positive) and world yaw second (`p.xz *= rot(uRot.x)`).
 - **Canvas Expand/Collapse Layout Trap**: Never allow `<canvas>` intrinsic `width`/`height` attributes to dictate flex/grid parent height, or collapsing a fullscreen widget will leave the window stretched. Keep `.canvas-viewport` / `.manifold-stage` at explicit heights (`430px` / `450px` in normal mode, `calc(100vh - ...)` in `.expanded`) and enforce `position: absolute; inset: 0; width: 100% !important; height: 100% !important;` on `<canvas>`.
 - **SSOT Language Binding on Sliders**: Every slider label (`sl_c0`..`sl_4d_disp`) must carry `data-i18n="sl_..."` so switching `EN`/`RU`/`MN` updates 100% of slider labels alongside tabs and headings.
 

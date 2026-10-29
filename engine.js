@@ -955,8 +955,11 @@
       }
 
       float map4D(vec3 p) {
+        // 1. Tilt around camera's horizontal screen axis X_cam FIRST (Pitch)
+        // Negative sign maps DOM clientY (down = +) to WebGL NDC Y (up = +)
+        p.yz *= rot(-uRot.y);
+        // 2. Orbit around world vertical axis Y_world SECOND (Yaw)
         p.xz *= rot(uRot.x);
-        p.yz *= rot(uRot.y);
 
         float r2 = dot(p, p);
         vec4 z4 = vec4(2.0 * p, 1.0 - r2) / (1.0 + r2);
