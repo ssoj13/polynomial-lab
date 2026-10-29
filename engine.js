@@ -44,9 +44,10 @@
     w3: true
   };
 
-  // Window #2 (3D Bridge) state
+  // Window #2 (3D Bridge) state — stores full [a0, a1, a2, a3, a4] polynomial!
   const state3D = {
     mode: "trampoline", // 'trampoline' | 'bezier3d'
+    coeffs: [-1.0, 0.0, 1.0, 0.0, 0.0],
     c0: -1.0,
     c2: 1.0,
     sliceY: 0.0,
@@ -58,20 +59,22 @@
     targetPitch: null,
     zoom: 1.0,
     dragging: false,
+    dragHandle: null,
+    projectedHandles: [],
     lastX: 0,
     lastY: 0
   };
 
-  // Window #3 (4D Hyperspace) state
+  // Window #3 (4D Hyperspace) state — matches grand volumetric shader from 890e135
   const state4D = {
     preset: 0,
     deg: 5.0,
-    torsion: 1.25,
-    fold: 0.35,
-    disp: 0.45,
-    yaw: 0.5,
-    pitch: 0.3,
-    zoom: 3.1,
+    torsion: 1.4,
+    fold: 0.65,
+    disp: 1.15,
+    yaw: 0.45,
+    pitch: 0.32,
+    zoom: 1.0,
     dragging: false,
     lastX: 0,
     lastY: 0
@@ -111,7 +114,7 @@
     };
   }
 
-  // Active polynomial coefficients [a0, a1, a2, a3, a4]
+  // Active polynomial coefficients [a0, a1, a2, a3, a4] across all 2D tabs
   function getActiveCoeffs() {
     if (polyState.mode2d === "roots") {
       const r1 = polyState.roots[0];
@@ -123,6 +126,20 @@
       const c2 = -a * (r1 + r2 + r3);
       const c3 = a;
       return [c0, c1, c2, c3, 0];
+    }
+    if (polyState.mode2d === "taylor") {
+      const k = 1.45;
+      const c1 = k;
+      const c3 = polyState.taylorDeg >= 3 ? -(k * k * k) / 6.0 : 0.0;
+      return [0.0, c1, 0.0, c3, 0.0];
+    }
+    if (polyState.mode2d === "bezier") {
+      const pts = polyState.ctrlPts;
+      const c0 = (pts[1].y + pts[2].y) * 0.35;
+      const c1 = (pts[3].y - pts[0].y) * 0.22;
+      const c2 = ((pts[0].y + pts[3].y) - (pts[1].y + pts[2].y)) * 0.18;
+      const c3 = ((pts[3].y - pts[0].y) - 3 * (pts[2].y - pts[1].y)) * 0.06;
+      return [c0, c1, c2, c3, 0.0];
     }
     return polyState.c.slice();
   }
@@ -237,8 +254,9 @@
     polyState.complexRoots = solveComplexRoots(coeffs);
 
     if (isWindowCoupled("w2") && isWindowCoupled("w1")) {
+      state3D.coeffs = coeffs.slice();
       state3D.c0 = coeffs[0];
-      state3D.c2 = Math.abs(coeffs[2]) > 0.05 ? coeffs[2] : 1.0;
+      state3D.c2 = coeffs[2];
       const sl3dC0 = document.getElementById("sl3dC0");
       const sl3dC2 = document.getElementById("sl3dC2");
       const val3dC0 = document.getElementById("val3dC0");
@@ -259,24 +277,32 @@
       }
       const imagEnergy = polyState.complexRoots.reduce((acc, r) => acc + Math.abs(r.im), 0);
       const coeffEnergy = Math.hypot(coeffs[0], coeffs[1], coeffs[2], coeffs[3], coeffs[4]);
-      state4D.deg = Math.max(2, Math.min(8, activeDeg + Math.abs(coeffs[4]) * 0.8));
-      state4D.torsion = Math.max(0.1, Math.min(3.5, 0.75 + coeffEnergy * 0.45 + imagEnergy * 0.35));
-      state4D.fold = Math.max(0.0, Math.min(1.0, 0.22 + Math.abs(coeffs[0]) * 0.22));
+      state4D.deg = Math.max(2, Math.min(8, activeDeg + Math.abs(coeffs[3]) * 0.4 + Math.abs(coeffs[4]) * 0.8));
+      state4D.torsion = Math.max(
+        0.2,
+        Math.min(3.5, 0.95 + coeffEnergy * 0.38 + coeffs[1] * 0.3 + imagEnergy * 0.35)
+      );
+      state4D.fold = Math.max(0.05, Math.min(1.5, 0.65 + coeffs[0] * 0.22));
+      state4D.disp = Math.max(0.2, Math.min(2.0, 1.05 + coeffs[1] * 0.18 + coeffs[3] * 0.22));
 
       const slDeg = document.getElementById("sl4dDeg");
       const slTor = document.getElementById("sl4dTorsion");
       const slFold = document.getElementById("sl4dFold");
+      const slDisp = document.getElementById("sl4dDisp");
       const vDeg = document.getElementById("val4dDeg");
       const vTor = document.getElementById("val4dTorsion");
       const vFold = document.getElementById("val4dFold");
+      const vDisp = document.getElementById("val4dDisp");
       const hudDeg = document.getElementById("hud4dDegVal");
 
       if (slDeg) slDeg.value = state4D.deg.toFixed(1);
       if (slTor) slTor.value = state4D.torsion.toFixed(2);
       if (slFold) slFold.value = state4D.fold.toFixed(2);
+      if (slDisp) slDisp.value = state4D.disp.toFixed(2);
       if (vDeg) vDeg.textContent = state4D.deg.toFixed(1);
       if (vTor) vTor.textContent = state4D.torsion.toFixed(2);
       if (vFold) vFold.textContent = state4D.fold.toFixed(2);
+      if (vDisp) vDisp.textContent = state4D.disp.toFixed(2);
       if (hudDeg) hudDeg.textContent = "n = " + Math.round(state4D.deg);
     }
 
@@ -285,14 +311,14 @@
   }
 
   function propagateFrom3D() {
+    state3D.coeffs[0] = state3D.c0;
+    state3D.coeffs[2] = state3D.c2;
     if (isWindowCoupled("w2") && isWindowCoupled("w1")) {
       polyState.mode2d = "anatomy";
       activate2DTab("anatomy");
       polyState.c[0] = state3D.c0;
-      polyState.c[1] = 0;
       polyState.c[2] = state3D.c2;
-      polyState.c[3] = 0;
-      polyState.c[4] = 0;
+      state3D.coeffs = polyState.c.slice();
       sync2DSlidersFromState();
       propagateFrom2D();
     } else {
@@ -468,9 +494,9 @@
       }
 
       ctx.strokeStyle = theme.accent;
-      ctx.lineWidth = 3.2;
+      ctx.lineWidth = 2.0;
       ctx.shadowColor = theme.accent;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 5;
       ctx.beginPath();
       for (let px = 0; px <= w; px += 2) {
         const x = xMin + (px / w) * (xMax - xMin);
@@ -488,10 +514,10 @@
           const ry = toY(0);
           ctx.fillStyle = theme.accent3;
           ctx.beginPath();
-          ctx.arc(rx, ry, 7, 0, Math.PI * 2);
+          ctx.arc(rx, ry, 4.5, 0, Math.PI * 2);
           ctx.fill();
           ctx.strokeStyle = theme.bg;
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1.4;
           ctx.stroke();
         }
       });
@@ -506,10 +532,10 @@
             const py = toY(hy);
             ctx.fillStyle = hx === 0 ? theme.warn : theme.accent2;
             ctx.beginPath();
-            ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+            ctx.arc(px, py, 3.8, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = theme.bg;
-            ctx.lineWidth = 1.8;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
           }
         });
@@ -522,16 +548,16 @@
           const py = toY(midY);
           ctx.fillStyle = theme.warn;
           ctx.beginPath();
-          ctx.arc(px, py, 6, 0, Math.PI * 2);
+          ctx.arc(px, py, 4.2, 0, Math.PI * 2);
           ctx.fill();
           ctx.strokeStyle = theme.bg;
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1.3;
           ctx.stroke();
         }
       }
     } else if (mode === "taylor") {
       ctx.strokeStyle = theme.accent2;
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]);
       ctx.beginPath();
       for (let px = 0; px <= w; px += 2) {
@@ -546,7 +572,7 @@
 
       const maxDeg = polyState.taylorDeg;
       ctx.strokeStyle = theme.accent;
-      ctx.lineWidth = 3.0;
+      ctx.lineWidth = 2.0;
       ctx.beginPath();
       for (let px = 0; px <= w; px += 2) {
         const x = (xMin + (px / w) * (xMax - xMin)) * 1.45;
@@ -568,7 +594,7 @@
       const pts = polyState.ctrlPts;
       if (polyState.curveMode === "bezier") {
         ctx.strokeStyle = theme.muted;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.0;
         ctx.setLineDash([4, 4]);
         ctx.beginPath();
         pts.forEach((p, idx) => {
@@ -588,14 +614,14 @@
         const s0 = lerpPt(r0, r1, t);
 
         ctx.strokeStyle = theme.accent2;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.0;
         ctx.beginPath();
         ctx.moveTo(toX(q0.x), toY(q0.y)); ctx.lineTo(toX(q1.x), toY(q1.y)); ctx.lineTo(toX(q2.x), toY(q2.y));
         ctx.moveTo(toX(r0.x), toY(r0.y)); ctx.lineTo(toX(r1.x), toY(r1.y));
         ctx.stroke();
 
         ctx.strokeStyle = theme.accent;
-        ctx.lineWidth = 3.2;
+        ctx.lineWidth = 2.0;
         ctx.beginPath();
         for (let step = 0; step <= 100; step++) {
           const u = step / 100;
@@ -612,11 +638,11 @@
 
         ctx.fillStyle = theme.accent3;
         ctx.beginPath();
-        ctx.arc(toX(s0.x), toY(s0.y), 6.5, 0, Math.PI * 2);
+        ctx.arc(toX(s0.x), toY(s0.y), 4.5, 0, Math.PI * 2);
         ctx.fill();
       } else {
         ctx.strokeStyle = theme.danger;
-        ctx.lineWidth = 3.0;
+        ctx.lineWidth = 2.0;
         ctx.beginPath();
         for (let px = 0; px <= w; px += 2) {
           const x = xMin + (px / w) * (xMax - xMin);
@@ -643,11 +669,11 @@
         const py = toY(p.y);
         ctx.fillStyle = theme.warn;
         ctx.beginPath();
-        ctx.arc(px, py, 7, 0, Math.PI * 2);
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = theme.text;
         ctx.font = "bold 11px monospace";
-        ctx.fillText(`P${idx}`, px + 9, py - 7);
+        ctx.fillText(`P${idx}`, px + 7, py - 6);
       });
     }
 
@@ -694,9 +720,9 @@
       const isReal = Math.abs(r.im) < 0.025;
       ctx.fillStyle = isReal ? theme.accent3 : theme.accent;
       ctx.shadowColor = ctx.fillStyle;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 5;
       ctx.beginPath();
-      ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+      ctx.arc(px, py, 4.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
     });
@@ -726,10 +752,16 @@
     };
   }
 
+  function get3DCoeffs() {
+    if (Array.isArray(state3D.coeffs) && state3D.coeffs.length === 5) {
+      return state3D.coeffs;
+    }
+    return [state3D.c0, 0, state3D.c2, 0, 0];
+  }
+
   function eval3DHeight(x, y) {
-    const re = state3D.c2 * (x * x - y * y) + state3D.c0;
-    const im = state3D.c2 * (2 * x * y);
-    const mod = Math.hypot(re, im);
+    const val = evalPolyComplex(get3DCoeffs(), { re: x, im: y });
+    const mod = Math.hypot(val.re, val.im);
     return Math.min(3.3, Math.log1p(mod) * 1.15);
   }
 
@@ -762,6 +794,7 @@
     const yaw = state3D.yaw;
     const pitch = state3D.pitch;
     const zoom = state3D.zoom;
+    state3D.projectedHandles = [];
 
     if (state3D.mode === "trampoline") {
       const range = 2.1;
@@ -846,9 +879,9 @@
         ctx.fill();
 
         ctx.strokeStyle = theme.warn;
-        ctx.lineWidth = 4.0;
+        ctx.lineWidth = 2.2;
         ctx.shadowColor = theme.warn;
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 6;
         ctx.beginPath();
         const sliceSteps = 80;
         for (let s = 0; s <= sliceSteps; s++) {
@@ -860,29 +893,61 @@
         }
         ctx.stroke();
         ctx.shadowBlur = 0;
+
+        // Interactive 3D curve-bending handles on the glowing slice seam:
+        // 1) Central apex handle (lifts/lowers a0 directly in 3D)
+        const zApex = eval3DHeight(0, sy);
+        const pApex = project3D(0, sy, zApex, w, h, yaw, pitch, zoom);
+        ctx.fillStyle = theme.warn;
+        ctx.beginPath();
+        ctx.arc(pApex.sx, pApex.sy, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = theme.bg;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        state3D.projectedHandles.push({
+          kind: "apex3d",
+          sx: pApex.sx,
+          sy: pApex.sy,
+          x: 0,
+          y: sy,
+          z: zApex
+        });
+
+        // 2) Left & right wing handles on the slice seam (bends a2 bowl & a1 slope directly in 3D)
+        [-1.35, 1.35].forEach(wx => {
+          const wz = eval3DHeight(wx, sy);
+          const pWing = project3D(wx, sy, wz, w, h, yaw, pitch, zoom);
+          ctx.fillStyle = theme.accent2;
+          ctx.beginPath();
+          ctx.arc(pWing.sx, pWing.sy, 4.0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = theme.bg;
+          ctx.lineWidth = 1.3;
+          ctx.stroke();
+          state3D.projectedHandles.push({
+            kind: "wing3d",
+            side: wx < 0 ? -1 : 1,
+            sx: pWing.sx,
+            sy: pWing.sy,
+            x: wx,
+            y: sy,
+            z: wz
+          });
+        });
       }
 
       if (state3D.showPillars) {
-        const c2 = Math.abs(state3D.c2) < 0.05 ? 0.05 : state3D.c2;
-        const ratio = -state3D.c0 / c2;
-        const roots3D =
-          ratio >= 0
-            ? [
-                { x: -Math.sqrt(ratio), y: 0, real: true },
-                { x: Math.sqrt(ratio), y: 0, real: true }
-              ]
-            : [
-                { x: 0, y: -Math.sqrt(-ratio), real: false },
-                { x: 0, y: Math.sqrt(-ratio), real: false }
-              ];
+        const roots3D = solveComplexRoots(get3DCoeffs());
 
         roots3D.forEach((rt, idx) => {
-          const pFloor = project3D(rt.x, rt.y, 0, w, h, yaw, pitch, zoom);
-          const pTop = project3D(rt.x, rt.y, 1.8, w, h, yaw, pitch, zoom);
-          const col = rt.real ? theme.accent3 : theme.danger;
+          const isReal = Math.abs(rt.im) < 0.025;
+          const pFloor = project3D(rt.re, rt.im, 0, w, h, yaw, pitch, zoom);
+          const pTop = project3D(rt.re, rt.im, 1.8, w, h, yaw, pitch, zoom);
+          const col = isReal ? theme.accent3 : theme.danger;
 
           ctx.strokeStyle = col;
-          ctx.lineWidth = 2.2;
+          ctx.lineWidth = 1.5;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
           ctx.moveTo(pFloor.sx, pFloor.sy);
@@ -892,36 +957,52 @@
 
           ctx.fillStyle = col;
           ctx.shadowColor = col;
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 6;
           ctx.beginPath();
-          ctx.arc(pFloor.sx, pFloor.sy, 7, 0, Math.PI * 2);
+          ctx.arc(pFloor.sx, pFloor.sy, 4.8, 0, Math.PI * 2);
           ctx.fill();
           ctx.shadowBlur = 0;
+          ctx.strokeStyle = theme.bg;
+          ctx.lineWidth = 1.3;
+          ctx.stroke();
+
+          state3D.projectedHandles.push({
+            kind: "root3d",
+            idx,
+            sx: pFloor.sx,
+            sy: pFloor.sy,
+            x: rt.re,
+            y: rt.im,
+            z: 0
+          });
 
           ctx.fillStyle = theme.text;
           ctx.font = "bold 11px monospace";
-          const lbl = rt.real
-            ? `z${idx + 1}=${rt.x.toFixed(2)}`
-            : `z${idx + 1}=${rt.y >= 0 ? "+" : ""}${rt.y.toFixed(2)}i`;
-          ctx.fillText(lbl, pFloor.sx + 9, pFloor.sy - 6);
+          const lbl = isReal
+            ? `z${idx + 1}=${rt.re.toFixed(2)}`
+            : `z${idx + 1}=${rt.re.toFixed(1)}${rt.im >= 0 ? "+" : ""}${rt.im.toFixed(1)}i`;
+          ctx.fillText(lbl, pFloor.sx + 7, pFloor.sy - 5);
         });
       }
     } else {
       const gridN = 18;
       const range = 2.0;
-      const arch = state3D.c0 * -0.55;
-      const twist = state3D.c2 * 0.45;
+      const c3d = get3DCoeffs();
+      const arch = c3d[0] * -0.55;
+      const tilt = (c3d[1] || 0) * 0.28;
+      const twist = (c3d[2] || 1.0) * 0.45;
+      const wave3 = (c3d[3] || 0) * 0.18;
 
       const evalWingZ = (u, v) => {
         const bellU = 1 - u * u * 0.35;
         const waveV = Math.sin(v * 1.3) * twist * u;
-        return 0.9 + arch * bellU * (1 - v * v * 0.25) + waveV;
+        return 0.9 + arch * bellU * (1 - v * v * 0.25) + tilt * u + wave3 * (u * u * u * 0.3) + waveV;
       };
 
       for (let i = 0; i <= gridN; i++) {
         const u = -range + (2 * range * i) / gridN;
         ctx.strokeStyle = i === Math.floor(gridN / 2) ? theme.warn : theme.accent;
-        ctx.lineWidth = i === Math.floor(gridN / 2) ? 3.0 : 1.2;
+        ctx.lineWidth = i === Math.floor(gridN / 2) ? 2.0 : 1.0;
         ctx.beginPath();
         for (let j = 0; j <= gridN; j++) {
           const v = -range + (2 * range * j) / gridN;
@@ -944,6 +1025,37 @@
         }
         ctx.stroke();
       }
+
+      // Draw interactive 3D Bézier wing control handles
+      const wingCtrl = [
+        { u: 0.0, v: 0.0, col: theme.warn, lbl: "B0(a₀)", role: "arch" },
+        { u: 1.45, v: 0.0, col: theme.accent3, lbl: "B1(a₁)", role: "tiltPos" },
+        { u: -1.45, v: 0.0, col: theme.accent3, lbl: "B2(a₁)", role: "tiltNeg" },
+        { u: 1.25, v: 1.25, col: theme.danger, lbl: "B3(a₂)", role: "twist" }
+      ];
+      wingCtrl.forEach(wc => {
+        const wz = evalWingZ(wc.u, wc.v);
+        const pt = project3D(wc.u, wc.v, wz, w, h, yaw, pitch, zoom);
+        ctx.fillStyle = wc.col;
+        ctx.beginPath();
+        ctx.arc(pt.sx, pt.sy, 4.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = theme.bg;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+        ctx.fillStyle = theme.text;
+        ctx.font = "bold 11px monospace";
+        ctx.fillText(wc.lbl, pt.sx + 6, pt.sy - 5);
+        state3D.projectedHandles.push({
+          kind: "bezierWing3d",
+          role: wc.role,
+          sx: pt.sx,
+          sy: pt.sy,
+          x: wc.u,
+          y: wc.v,
+          z: wz
+        });
+      });
     }
   }
 
@@ -982,60 +1094,106 @@
       uniform vec2 uRot;
       uniform float uZoom;
       uniform int uPreset;
+      uniform vec4 uPoly;
 
-      mat2 rot(float a) {
+      mat2 rot2(float a) {
         float c = cos(a), s = sin(a);
         return mat2(c, -s, s, c);
       }
 
-      float map4D(vec3 p) {
-        // 1. Tilt around camera's horizontal screen axis X_cam FIRST (Pitch)
-        // Negative sign maps DOM clientY (down = +) to WebGL NDC Y (up = +)
-        p.yz *= rot(-uRot.y);
-        // 2. Orbit around world vertical axis Y_world SECOND (Yaw)
-        p.xz *= rot(uRot.x);
+      vec4 rotSO4(vec4 p, float alpha, float beta) {
+        float ca = cos(alpha), sa = sin(alpha);
+        float cb = cos(beta),  sb = sin(beta);
+        vec4 q = vec4(
+          ca * p.x - sa * p.y,
+          sa * p.x + ca * p.y,
+          cb * p.z - sb * p.w,
+          sb * p.z + cb * p.w
+        );
+        float cw = cos(alpha * 0.5), sw = sin(alpha * 0.5);
+        q.xz = mat2(cw, -sw, sw, cw) * q.xz;
+        return q;
+      }
+
+      vec2 polynomialManifoldField(vec3 p, float t) {
+        float polyMod = 0.12 * (uPoly.x + uPoly.y * p.x + uPoly.z * (p.x * p.x - p.y * p.y) + uPoly.w * p.z);
+        p += (uFold * 0.28 + polyMod) * sin(p.yzx * uDeg + t * 0.65);
 
         float r2 = dot(p, p);
-        vec4 z4 = vec4(2.0 * p, 1.0 - r2) / (1.0 + r2);
+        float invDenom = 1.0 / (1.0 + r2);
+        vec4 z = vec4(2.0 * p, r2 - 1.0) * invDenom;
+        z = rotSO4(z, t * 0.33 + uFold * 0.6, t * 0.21 * uTorsion);
 
-        float wPhase = uTime * 0.35 + uFold * 3.14159;
-        z4.xy *= rot(wPhase);
-        z4.zw *= rot(wPhase * 0.7 + uTorsion * 0.5);
+        float phi1 = atan(z.y, z.x);
+        float phi2 = atan(z.w, z.z);
+        float eta = atan(length(z.zw), length(z.xy));
 
-        float rad1 = length(z4.xy);
-        float rad2 = length(z4.zw);
-        float ang1 = atan(z4.y, z4.x);
-        float ang2 = atan(z4.w, z4.z);
+        float knotPhase = uDeg * phi1 - floor(uTorsion * 2.0 + 0.5) * phi2 + t * 0.95;
+        float targetEta = 0.785398 + (0.32 + 0.08 * uPoly.w) * sin(knotPhase);
 
-        float n = max(2.0, uDeg);
-        float polyWave = cos(n * ang1 + uTorsion * ang2) * 0.18;
+        float conformal = (1.0 + r2) * 0.5;
+        float dShell = abs(eta - targetEta) * conformal * 0.55;
 
-        float dTorus = length(vec2(length(p.xz) - (1.15 + polyWave), p.y)) - (0.34 + 0.08 * sin(n * ang1));
-        float dHopf = abs(rad1 - rad2 * (0.85 + 0.25 * sin(uTorsion))) - 0.18 + polyWave * 0.35;
+        float dualPhase = sin(uDeg * phi1 + uTorsion * phi2 * 2.0 - t * 0.75);
+        float dWeb = length(vec2(eta - 0.785398, dualPhase * 0.25)) * conformal * 0.52;
 
-        return mix(dTorus, dHopf * 1.4, 0.45 + 0.12 * float(uPreset));
+        float dQuintic = abs(length(p) - 0.85 - 0.16 * cos(uDeg * phi1 + 4.0 * phi2)) * 0.58;
+        float d = min(dShell, dWeb);
+        float quinticMix = clamp(uFold * 0.65 + (uPreset == 1 ? 0.35 : 0.0), 0.0, 1.0);
+        d = mix(d, min(d, dQuintic), quinticMix);
+
+        float spectralAngle = phi1 * 1.5 - phi2 * 1.5 + eta * 3.0 + polyMod * 4.0;
+        return vec2(d, spectralAngle);
+      }
+
+      vec3 palette(float x) {
+        vec3 a = vec3(0.50, 0.52, 0.58);
+        vec3 b = vec3(0.48, 0.45, 0.48);
+        vec3 c = vec3(1.00, 1.00, 1.00);
+        vec3 d = vec3(0.05, 0.33, 0.67);
+        return a + b * cos(6.28318 * (c * x + d));
       }
 
       void main() {
         vec2 uv = (vUv * uRes) / min(uRes.x, uRes.y);
-        vec3 ro = vec3(0.0, 0.0, -uZoom);
-        vec3 rd = normalize(vec3(uv, 1.65));
+        float t = uTime;
 
-        float t = 0.0;
+        vec3 ro = vec3(0.0, 0.0, -3.35 / uZoom);
+        vec3 rd = normalize(vec3(uv, 1.45));
+
+        // 1. Pitch around camera horizontal axis FIRST (no vertical inversion)
+        mat2 rx = rot2(-uRot.y);
+        // 2. Yaw around world vertical axis SECOND
+        mat2 ry = rot2(-uRot.x - t * 0.1);
+        ro.yz = rx * ro.yz;
+        rd.yz = rx * rd.yz;
+        ro.xz = ry * ro.xz;
+        rd.xz = ry * rd.xz;
+
+        vec3 col = vec3(0.01, 0.015, 0.038);
+        float dist = 0.2;
         vec3 accum = vec3(0.0);
+
         for (int i = 0; i < 68; i++) {
-          vec3 p = ro + rd * t;
-          float d = map4D(p);
-          float glow = exp(-abs(d) * 14.0);
-          vec3 col = 0.5 + 0.5 * cos(vec3(0.0, 2.1, 4.2) + uDeg * 0.45 + length(p) * 1.6 + uDisp * float(i) * 0.06);
-          accum += col * glow * 0.038;
-          t += max(0.028, abs(d) * 0.52);
-          if (t > 7.5) break;
+          vec3 pos = ro + rd * dist;
+          vec2 res = polynomialManifoldField(pos, t);
+          float d = res.x;
+          float phase = res.y;
+
+          vec3 fiberCol = palette(phase * 0.15915 + uDisp * dist * 0.22 + t * 0.07);
+          float stepDist = max(abs(d) * 0.54, 0.016);
+          float density = exp(-abs(d) * 19.0) / (1.0 + dist * dist * 0.14);
+          float fringe = 0.65 + 0.35 * sin(phase * 4.0 + dist * 6.0 - t * 2.8);
+          accum += fiberCol * density * fringe * 0.058;
+
+          dist += stepDist;
+          if (dist > 7.6) break;
         }
 
-        vec3 bg = vec3(0.03, 0.04, 0.08);
-        vec3 finalCol = bg + pow(accum, vec3(0.88));
-        fragColor = vec4(finalCol, 1.0);
+        col += accum * (1.2 + uDisp * 0.42);
+        col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
+        col *= 1.0 - 0.22 * dot(vUv, vUv);
+        fragColor = vec4(pow(clamp(col, 0.0, 1.0), vec3(0.9)), 1.0);
       }
     `;
 
@@ -1071,7 +1229,8 @@
       uDisp: gl4d.getUniformLocation(prog4d, "uDisp"),
       uRot: gl4d.getUniformLocation(prog4d, "uRot"),
       uZoom: gl4d.getUniformLocation(prog4d, "uZoom"),
-      uPreset: gl4d.getUniformLocation(prog4d, "uPreset")
+      uPreset: gl4d.getUniformLocation(prog4d, "uPreset"),
+      uPoly: gl4d.getUniformLocation(prog4d, "uPoly")
     };
   }
 
@@ -1087,9 +1246,15 @@
       gl4d.uniform1f(uLocs4d.uTorsion, state4D.torsion);
       gl4d.uniform1f(uLocs4d.uFold, state4D.fold);
       gl4d.uniform1f(uLocs4d.uDisp, state4D.disp);
-      gl4d.uniform2f(uLocs4d.uRot, state4D.yaw + timeSec * 0.15, state4D.pitch);
+      gl4d.uniform2f(uLocs4d.uRot, state4D.yaw, state4D.pitch);
       gl4d.uniform1f(uLocs4d.uZoom, state4D.zoom);
       gl4d.uniform1i(uLocs4d.uPreset, state4D.preset);
+      if (isWindowCoupled("w3") && isWindowCoupled("w1")) {
+        const c = getActiveCoeffs();
+        gl4d.uniform4f(uLocs4d.uPoly, c[0] || 0, c[1] || 0, c[2] || 0, c[3] || 0);
+      } else {
+        gl4d.uniform4f(uLocs4d.uPoly, 0, 0, 0, 0);
+      }
       gl4d.drawArrays(gl4d.TRIANGLE_STRIP, 0, 4);
     }
 
@@ -1370,6 +1535,7 @@
         activate2DTab(btn.getAttribute("data-tab2d"));
         propagateFrom2D();
         drawWindow1();
+        drawWindow2();
       });
     });
 
@@ -1717,25 +1883,137 @@
 
     const c3d = document.getElementById("plot3dCanvas");
     if (c3d) {
+      const findHitHandle3D = e => {
+        const rect = c3d.getBoundingClientRect();
+        const scaleX = c3d.width / Math.max(1, rect.width);
+        const scaleY = c3d.height / Math.max(1, rect.height);
+        const px = (e.clientX - rect.left) * scaleX;
+        const py = (e.clientY - rect.top) * scaleY;
+        const hitR = (e.pointerType === "touch" ? 28 : 16) * Math.max(scaleX, scaleY);
+        let best = null;
+        let bestDist = hitR;
+        for (const h of state3D.projectedHandles) {
+          const d = Math.hypot(h.sx - px, h.sy - py);
+          if (d < bestDist) {
+            bestDist = d;
+            best = h;
+          }
+        }
+        return best;
+      };
+
+      const sync3DSlidersUI = () => {
+        const sl0 = document.getElementById("sl3dC0");
+        const vl0 = document.getElementById("val3dC0");
+        const sl2 = document.getElementById("sl3dC2");
+        const vl2 = document.getElementById("val3dC2");
+        if (sl0) sl0.value = state3D.c0.toFixed(2);
+        if (vl0) vl0.textContent = state3D.c0.toFixed(2);
+        if (sl2) sl2.value = state3D.c2.toFixed(2);
+        if (vl2) vl2.textContent = state3D.c2.toFixed(2);
+      };
+
       c3d.addEventListener("pointerdown", e => {
-        state3D.dragging = true;
+        const hit = findHitHandle3D(e);
         state3D.targetYaw = null;
         state3D.targetPitch = null;
         state3D.lastX = e.clientX;
         state3D.lastY = e.clientY;
+        try { c3d.setPointerCapture(e.pointerId); } catch (_) {}
+        if (hit) {
+          state3D.dragHandle = hit;
+          state3D.dragging = false;
+        } else {
+          state3D.dragHandle = null;
+          state3D.dragging = true;
+        }
       });
+
       window.addEventListener("pointermove", e => {
-        if (!state3D.dragging) return;
+        if (!state3D.dragging && !state3D.dragHandle) return;
         const dx = e.clientX - state3D.lastX;
         const dy = e.clientY - state3D.lastY;
         state3D.lastX = e.clientX;
         state3D.lastY = e.clientY;
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+        if (state3D.dragHandle) {
+          const h = state3D.dragHandle;
+          if (h.kind === "apex3d") {
+            // Vertical drag on central 3D apex lifts/lowers a0
+            state3D.c0 = clamp(state3D.c0 - dy * 0.018, -2.5, 2.5);
+            state3D.coeffs[0] = state3D.c0;
+            sync3DSlidersUI();
+            propagateFrom3D();
+            drawWindow1();
+            drawWindow2();
+          } else if (h.kind === "wing3d") {
+            // Dragging side wing handle on 3D slice adjusts a2 (bowl curvature) & a1 (slope)
+            state3D.c2 = clamp(state3D.c2 - dy * 0.015, -2.5, 2.5);
+            state3D.coeffs[2] = state3D.c2;
+            const newC1 = clamp((state3D.coeffs[1] || 0) + dx * 0.012 * h.side, -2.5, 2.5);
+            state3D.coeffs[1] = newC1;
+            if (isWindowCoupled("w2") && isWindowCoupled("w1")) {
+              polyState.c[1] = newC1;
+            }
+            sync3DSlidersUI();
+            propagateFrom3D();
+            drawWindow1();
+            drawWindow2();
+          } else if (h.kind === "root3d") {
+            // Unproject screen delta onto 3D floor basis vectors (Real X and Imag iY)
+            const w = c3d.width, ch = c3d.height;
+            const p0 = project3D(h.x, h.y, 0, w, ch, state3D.yaw, state3D.pitch, state3D.zoom);
+            const px1 = project3D(h.x + 0.5, h.y, 0, w, ch, state3D.yaw, state3D.pitch, state3D.zoom);
+            const py1 = project3D(h.x, h.y + 0.5, 0, w, ch, state3D.yaw, state3D.pitch, state3D.zoom);
+            const vx = { x: (px1.sx - p0.sx) * 2, y: (px1.sy - p0.sy) * 2 };
+            const vy = { x: (py1.sx - p0.sx) * 2, y: (py1.sy - p0.sy) * 2 };
+            const rect = c3d.getBoundingClientRect();
+            const sdx = dx * (w / Math.max(1, rect.width));
+            const sdy = dy * (ch / Math.max(1, rect.height));
+            const dRe = (sdx * vx.x + sdy * vx.y) / Math.max(40, vx.x * vx.x + vx.y * vx.y);
+            const dIm = (sdx * vy.x + sdy * vy.y) / Math.max(40, vy.x * vy.x + vy.y * vy.y);
+            h.x = clamp(h.x + dRe, -2.2, 2.2);
+            h.y = clamp(h.y + dIm, -2.2, 2.2);
+            const c2 = Math.abs(state3D.c2) < 0.2 ? 1.0 : state3D.c2;
+            const signedR2 = Math.abs(h.y) > Math.abs(h.x) ? (h.y * h.y) : -(h.x * h.x);
+            state3D.c0 = clamp(signedR2 * c2, -2.5, 2.5);
+            state3D.coeffs[0] = state3D.c0;
+            sync3DSlidersUI();
+            propagateFrom3D();
+            drawWindow1();
+            drawWindow2();
+          } else if (h.kind === "bezierWing3d") {
+            if (h.role === "arch") {
+              state3D.c0 = clamp(state3D.c0 + dy * 0.018, -2.5, 2.5);
+              state3D.coeffs[0] = state3D.c0;
+            } else if (h.role === "tiltPos" || h.role === "tiltNeg") {
+              const sgn = h.role === "tiltPos" ? 1 : -1;
+              const nextC1 = clamp((state3D.coeffs[1] || 0) - dy * 0.018 * sgn, -2.5, 2.5);
+              state3D.coeffs[1] = nextC1;
+              if (isWindowCoupled("w2") && isWindowCoupled("w1")) polyState.c[1] = nextC1;
+            } else if (h.role === "twist") {
+              state3D.c2 = clamp(state3D.c2 - dy * 0.018, -2.5, 2.5);
+              state3D.coeffs[2] = state3D.c2;
+            }
+            sync3DSlidersUI();
+            propagateFrom3D();
+            drawWindow1();
+            drawWindow2();
+          }
+          return;
+        }
+
         state3D.yaw += dx * 0.008;
         state3D.pitch = Math.max(-0.2, Math.min(1.35, state3D.pitch + dy * 0.008));
       });
-      window.addEventListener("pointerup", () => {
+
+      const end3D = () => {
         state3D.dragging = false;
-      });
+        state3D.dragHandle = null;
+      };
+      window.addEventListener("pointerup", end3D);
+      window.addEventListener("pointercancel", end3D);
       c3d.addEventListener(
         "wheel",
         e => {
@@ -1747,10 +2025,40 @@
       );
     }
 
+    const presets4D = [
+      { deg: 3.0, torsion: 2.0, fold: 0.25, disp: 0.85 },
+      { deg: 5.0, torsion: 1.4, fold: 0.65, disp: 1.15 },
+      { deg: 7.0, torsion: 0.8, fold: 1.25, disp: 1.75 }
+    ];
     document.querySelectorAll("[data-preset4d]").forEach(btn => {
       btn.addEventListener("click", () => {
-        state4D.preset = parseInt(btn.getAttribute("data-preset4d"), 10);
-        document.querySelectorAll("[data-preset4d]").forEach(b => b.classList.toggle("active", b === btn));
+        const idx = parseInt(btn.getAttribute("data-preset4d"), 10);
+        state4D.preset = idx;
+        const p = presets4D[idx] || presets4D[1];
+        state4D.deg = p.deg;
+        state4D.torsion = p.torsion;
+        state4D.fold = p.fold;
+        state4D.disp = p.disp;
+        const sDeg = document.getElementById("sl4dDeg");
+        const sTor = document.getElementById("sl4dTorsion");
+        const sFold = document.getElementById("sl4dFold");
+        const sDisp = document.getElementById("sl4dDisp");
+        const vDeg = document.getElementById("val4dDeg");
+        const vTor = document.getElementById("val4dTorsion");
+        const vFold = document.getElementById("val4dFold");
+        const vDisp = document.getElementById("val4dDisp");
+        const hd = document.getElementById("hud4dDegVal");
+        if (sDeg) sDeg.value = p.deg.toFixed(1);
+        if (sTor) sTor.value = p.torsion.toFixed(2);
+        if (sFold) sFold.value = p.fold.toFixed(2);
+        if (sDisp) sDisp.value = p.disp.toFixed(2);
+        if (vDeg) vDeg.textContent = p.deg.toFixed(1);
+        if (vTor) vTor.textContent = p.torsion.toFixed(2);
+        if (vFold) vFold.textContent = p.fold.toFixed(2);
+        if (vDisp) vDisp.textContent = p.disp.toFixed(2);
+        if (hd) hd.textContent = "n = " + Math.round(p.deg);
+        document.querySelectorAll("[data-preset4d]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
       });
     });
 
@@ -1796,7 +2104,7 @@
         "wheel",
         e => {
           e.preventDefault();
-          state4D.zoom = Math.max(1.8, Math.min(5.2, state4D.zoom * (e.deltaY < 0 ? 0.92 : 1.08)));
+          state4D.zoom = Math.max(0.45, Math.min(2.8, state4D.zoom * (e.deltaY < 0 ? 1.08 : 0.92)));
         },
         { passive: false }
       );
