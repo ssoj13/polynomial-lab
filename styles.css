@@ -1136,17 +1136,29 @@ html, body {
 }
 
 .widget-story {
-  padding: 9px 13px;
+  padding: 11px 15px;
   border-radius: 7px;
   background: var(--bg-crust);
   border-left: 3px solid var(--accent);
-  font-size: 12.5px;
-  line-height: 1.55;
+  font-size: 12.8px;
+  line-height: 1.58;
   color: var(--subtext);
 }
 
 .widget-story b {
   color: var(--fg);
+}
+
+.widget-story ul {
+  margin: 6px 0 6px 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.widget-story li {
+  line-height: 1.48;
 }
 
 .widget-card.expanded .widget-story {

@@ -1381,6 +1381,31 @@
     updateClutchButtonsUI();
     updateFormulaBanner();
     updateRootTelemetry();
+    updateWindowStories();
+  }
+
+  function updateWindowStories() {
+    const dict = (window.POLY_I18N && window.POLY_I18N[currentLang]) || window.POLY_I18N.ru;
+    if (!dict) return;
+
+    const w1El = document.querySelector("#card2d .widget-story");
+    if (w1El) {
+      const k1 = "w1_story_" + (polyState.mode2d || "anatomy");
+      w1El.innerHTML = dict[k1] || dict.w1_story || "";
+    }
+
+    const w2El = document.querySelector("#card3d .widget-story");
+    if (w2El) {
+      const k2 = "w2_story_" + (state3D.mode || "trampoline");
+      w2El.innerHTML = dict[k2] || dict.w2_story || "";
+    }
+
+    const w3El = document.querySelector("#card4d .widget-story");
+    if (w3El) {
+      const pIdx = state4D.preset !== undefined ? state4D.preset : 0;
+      const k3 = "w3_story_p" + pIdx;
+      w3El.innerHTML = dict[k3] || dict.w3_story || "";
+    }
   }
 
   function applyTheme(theme) {
@@ -1431,6 +1456,7 @@
       const panel = document.getElementById("panel2d_" + t);
       if (panel) panel.classList.toggle("hidden", t !== tabName);
     });
+    updateWindowStories();
   }
 
   function runQuestStep(stepNum) {
@@ -1817,6 +1843,7 @@
       btn.addEventListener("click", () => {
         state3D.mode = btn.getAttribute("data-tab3d");
         document.querySelectorAll("[data-tab3d]").forEach(b => b.classList.toggle("active", b === btn));
+        updateWindowStories();
         drawWindow2();
       });
     });
@@ -2059,6 +2086,7 @@
         if (hd) hd.textContent = "n = " + Math.round(p.deg);
         document.querySelectorAll("[data-preset4d]").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
+        updateWindowStories();
       });
     });
 
