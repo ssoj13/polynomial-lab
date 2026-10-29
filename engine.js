@@ -1371,7 +1371,7 @@
           <article class="dict-card">
             <div class="dict-card-title">${item.title}</div>
             <div class="dict-card-sub">${item.sub}</div>
-            <p>${item.body}</p>
+            <div class="dict-card-body">${item.body}</div>
           </article>
         `
         )

@@ -1152,13 +1152,15 @@ html, body {
 .widget-story ul {
   margin: 6px 0 6px 18px;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
 }
 
 .widget-story li {
+  margin-bottom: 4px;
   line-height: 1.48;
+}
+
+.widget-story li:last-child {
+  margin-bottom: 0;
 }
 
 .widget-card.expanded .widget-story {
@@ -1669,30 +1671,25 @@ input[type="range"] {
   color: #cdd6f4;
   opacity: 0.92;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  display: block;
   text-align: left;
-  line-height: 1.3;
+  line-height: 1.35;
   white-space: normal;
   word-break: break-word;
 }
 
 .hud-cell-val {
   padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  display: block;
   text-align: left;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
   white-space: normal;
   word-break: break-word;
 }
 
 .hud-cell-full {
   grid-column: 1 / -1;
-  justify-content: flex-start;
   padding: 6px 10px;
 }
 
@@ -1760,16 +1757,14 @@ input[type="range"] {
 }
 
 .manifold-lore-card {
-  padding: 13px 15px;
+  display: block;
+  padding: 14px 16px;
   border-radius: 8px;
   background: var(--bg-crust);
   border: 1px solid var(--border);
-  font-size: 12.6px;
-  line-height: 1.58;
+  font-size: 12.8px;
+  line-height: 1.62;
   color: var(--subtext);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .manifold-lore-card b {
@@ -1777,18 +1772,25 @@ input[type="range"] {
 }
 
 .manifold-lore-card .lore-title {
+  display: block;
   font-size: 13.5px;
   font-weight: 800;
   color: var(--accent);
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .manifold-lore-card ul {
-  margin: 4px 0 2px 18px;
+  margin: 6px 0 4px 18px;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+}
+
+.manifold-lore-card li {
+  margin-bottom: 6px;
+  line-height: 1.55;
+}
+
+.manifold-lore-card li:last-child {
+  margin-bottom: 0;
 }
 
 /* =========================================================================
@@ -1835,10 +1837,32 @@ input[type="range"] {
   color: var(--peach);
 }
 
-.dict-card p {
+.dict-card p,
+.dict-card-body {
+  display: block;
   font-size: 13px;
   line-height: 1.6;
   color: var(--subtext);
+}
+
+.dict-card-body b,
+.popup-block b,
+.callout-box b,
+.section-desc b {
+  color: var(--fg);
+}
+
+.popup-block ul,
+.popup-block ol,
+.dict-card-body ul {
+  margin: 6px 0 4px 18px;
+  padding: 0;
+}
+
+.popup-block li,
+.dict-card-body li {
+  margin-bottom: 4px;
+  line-height: 1.52;
 }
 
 .popup-backdrop {
